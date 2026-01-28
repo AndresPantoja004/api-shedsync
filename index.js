@@ -5,12 +5,24 @@ const port = 3000;
 const { sequelize  } = require('./database/db_conection');
 
 const auth = require('./routes/auth/auth.routes');
-
+const aula = require('./routes/aula/aula.routes');
+const incidencia = require('./routes/incidencia/incidencia.routes');
+const horario = require('./routes/horario/horario.routes');
+const carrera = require('./routes/carrera/carrera.routes');
+const estudiante = require('./routes/estudiante/estudiante.routes');
+const laboratorio = require('./routes/laboratorio/laboratorio.routes');
 
 app.use(express.json());
 app.use(cors());
 
 app.use('/api/auth', auth);
+app.use('/api/aula', aula);
+app.use('/api/incidencia', incidencia);
+app.use('/api/horario', horario);
+app.use('/api/carrera', carrera);
+app.use('/api/estudiante', estudiante);
+app.use('/api/laboratorio', laboratorio);
+
 
 
 const start = async () => {
