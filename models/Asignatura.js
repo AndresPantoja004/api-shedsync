@@ -10,7 +10,6 @@ const Asignatura = sequelize.define('Asignatura', {
   },
   nombre: DataTypes.STRING,
   nrc: DataTypes.STRING,
-  creditos: DataTypes.INTEGER,
 }, {
   tableName: 'asignatura',
   timestamps: false,
