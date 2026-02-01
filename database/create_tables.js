@@ -22,6 +22,7 @@ const iniciar = async () => {
     console.log('✅ Conectado a PostgreSQL');
     await sequelize.sync({ alter: true });
     console.log('✅ Tablas creadas / actualizadas');
+    
     process.exit(0);
   } catch (error) {
     console.error('❌ Error:', error);
