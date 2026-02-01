@@ -8,10 +8,15 @@ function parseHorarioExcel(path) {
 
   let periodo = null;
   let horarios = [];
+  let carrera = "";
 
   for (const row of rows) {
     if (!row.length) continue;
 
+    if (typeof row[0] === 'string' && row[0].includes('CARRERA')) {
+      carrera = row[0].match(/CARRERA DE (.+)/i)?.[1];
+      continue;
+    }
     if (typeof row[0] === 'string' && row[0].includes('PERIODO')) {
       periodo = row[0];
       continue;
@@ -46,6 +51,7 @@ function parseHorarioExcel(path) {
         if (!data) return;
 
         horarios.push({
+          carrera,
           periodo,
           nrc: String(nrc),
           codigo,

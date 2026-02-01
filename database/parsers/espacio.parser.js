@@ -6,14 +6,14 @@ export function parseEspacio(raw) {
     .toUpperCase()
     .replace(/\s+/g, " ")
     .trim();
-
+  console.log(texto)
   if (texto.includes("VIRTUAL") || texto.includes("EN LINEA")) {
     return { tipo: "virtual", nombre: "VIRTUAL" };
   }
 
   const isLab = /LAB|LABORATORIO/.test(texto);
 
-  const matchAula = texto.match(/AULA\s*([A-Z]?-?\d+)/);
+  const matchAula = texto.match(/([A-Z]{2})?-?AULA\s*([A-Z]?-?\d+)/);
 
   if (isLab) {
     return {
@@ -26,7 +26,7 @@ export function parseEspacio(raw) {
   if (matchAula) {
     return {
       tipo: "aula",
-      codigo: matchAula[1]
+      codigo: matchAula[2]
     };
   }
 

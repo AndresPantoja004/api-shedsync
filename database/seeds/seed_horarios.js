@@ -1,28 +1,30 @@
 const { sequelize } = require('../db_conection');
 const parseHorarioExcel = require('../parsers/horario.parser');
-const Profesor = require('../../models/Profesor');
-const Asignatura = require('../../models/Asignatura');
-const Aula = require('../../models/Aula');
-const Laboratorio = require('../../models/Laboratorio');
 const Horario = require('../../models/Horario');
 const { findOrCreateProfesor } = require('./create/findOrCreateProfesor');
 const { findOrCreateAsignatura } = require('./create/findOrCreateAsignatura');
 const { findOrCreateEspacio } = require('./create/findOrCreateEspacio');
+const { findOrCreateTipoCarrera } = require('./create/findOrCreateTipoCarrera');
+const { findOrCreateCarrera } = require('./create/findOrCreateCarrera');
+const { findOrCreateSemestre } = require('./create/findOrCreateSemestre');
+const { parseNivelSemestre } = require('../parsers/periodo.parser');
 
-async function seedHorarios() {
+async function seedHorarios(file) {
   await sequelize.authenticate();
 
-  const data = parseHorarioExcel('./database/horarios/HORARIO_BIOT_202551.xlsx');
+  const data = parseHorarioExcel(file);
+  console.log(data)
+
+  const [tipo_carrera] = await findOrCreateTipoCarrera('Presencial');
+  const [carrera] = await findOrCreateCarrera(data, tipo_carrera.id_tipo_carrera);
+  const semestreIdByNivel = await findOrCreateSemestre(data, carrera.id_carrera);
 
   for (const h of data) {
-    if (h.docente.includes('DOCENTE EDUCACIÓN')) continue;
+    if (h.docente?.includes('DOCENTE EDUCACIÓN')) continue;
 
+    const id_semestre = semestreIdByNivel[parseNivelSemestre(h.periodo)];
     const [profesor] = await findOrCreateProfesor(h.docente);
-
-    const [asignatura] = await findOrCreateAsignatura(h, profesor)
-
-    console.log(h.espacio)
-
+    const [asignatura] = await findOrCreateAsignatura(h, profesor, id_semestre);
     const espacio = await findOrCreateEspacio(h.espacio);
 
     await Horario.create({
@@ -39,4 +41,6 @@ async function seedHorarios() {
   process.exit(0);
 }
 
-seedHorarios();
+seedHorarios('./database/horarios/HORARIO_BIOT_202551.xlsx');
+seedHorarios('./database/horarios/HORARIO_AGRO_202551.xlsx');
+seedHorarios('./database/horarios/HORARIO_ITIJ_202551.xlsx');
