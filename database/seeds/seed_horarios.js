@@ -32,8 +32,8 @@ async function seedHorarios(file) {
       hora_inicio: h.hora_inicio,
       hora_fin: h.hora_fin,
       id_asignatura: asignatura.id_asignatura,
-      id_aula: espacio[0]?.id_aula,
-      id_laboratorio: espacio[0]?.id_laboratorio
+      id_aula: espacio?.aula?.id_aula ?? null,
+      id_laboratorio: espacio?.laboratorio?.id_laboratorio ?? null
     });
   }
 

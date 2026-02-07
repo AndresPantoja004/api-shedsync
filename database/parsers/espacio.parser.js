@@ -1,37 +1,47 @@
 export function parseEspacio(raw) {
-
   if (!raw) return null;
 
   let texto = raw
     .toUpperCase()
+    .replace(/\d{1,2}:\d{2}\s*-\s*\d{1,2}:\d{2}/g, "") // elimina horarios
     .replace(/\s+/g, " ")
     .trim();
-  console.log(texto)
+
   if (texto.includes("VIRTUAL") || texto.includes("EN LINEA")) {
-    return { tipo: "virtual", nombre: "VIRTUAL" };
+    return {
+      tipo: "virtual",
+      nombre: "VIRTUAL",
+      capacidad: null
+    };
   }
 
   const isLab = /LAB|LABORATORIO/.test(texto);
 
-  const matchAula = texto.match(/([A-Z]{2})?-?AULA\s*([A-Z]?-?\d+)/);
+  const matchAula = texto.match(/AULA\s*([A-Z]?)-?(\d+)/);
+
+  const aulaCodigo = matchAula
+    ? `${matchAula[1] || "A"}${matchAula[2].padStart(2, "0")}`
+    : null;
 
   if (isLab) {
     return {
       tipo: "laboratorio",
       nombre: texto,
-      aulaCodigo: matchAula?.[1] || null
+      capacidad: 25
     };
   }
 
-  if (matchAula) {
+  if (aulaCodigo) {
     return {
       tipo: "aula",
-      codigo: matchAula[2]
+      codigo: aulaCodigo,
+      capacidad: 30
     };
   }
 
   return {
     tipo: "otro",
-    nombre: texto
+    nombre: texto,
+    capacidad: null
   };
 }
