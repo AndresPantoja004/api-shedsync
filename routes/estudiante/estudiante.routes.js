@@ -1,14 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const controller = require('../../controllers/estudiante/estudiante.controller');
+const controllerEstudiante = require('../../controllers/estudiante/estudiante.controller');
+const auth = require('../../middlewares/auth.middleware');
 
-router.get('/', controller.getAll);
-router.get('/:id', controller.getById);
-router.post('/', controller.create);
-router.put('/:id', controller.update);
+// 🔒 Todas estas rutas requieren token
+router.get('/all', auth, controllerEstudiante.getAll);
+router.get('/', auth, controllerEstudiante.getById);
+router.post('/', auth, controllerEstudiante.create);
+router.put('/:id', auth, controllerEstudiante.update);
 
 // lógica académica
-router.get('/:id/semestres', controller.getSemestres);
-router.post('/:id/semestres', controller.asignarSemestre);
+router.get('/:id/semestres', controllerEstudiante.getSemestres);
+router.post('/:id/semestres', auth, controllerEstudiante.asignarSemestre);
+
 
 module.exports = router;

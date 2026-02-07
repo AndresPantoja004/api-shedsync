@@ -5,6 +5,7 @@ const Semestre = require('../../models/Semestre');
 
 exports.getAll = async (req, res) => {
   try {
+    console.log('USUARIO AUTENTICADO:', req.user);
     const estudiantes = await Estudiante.findAll({ include: Carrera });
     res.json(estudiantes);
   } catch (e) {
@@ -14,7 +15,9 @@ exports.getAll = async (req, res) => {
 
 exports.getById = async (req, res) => {
   try {
-    const estudiante = await Estudiante.findByPk(req.params.id, { include: Carrera });
+    const idUsuario = req.user.id_usuario;
+    console.log("USUARIO EN GET BY ID:"+ req.user.id_usuario)
+    const estudiante = await Estudiante.findOne({where:{id_usuario: idUsuario}}, { include: Carrera });
     if (!estudiante) return res.status(404).json({ msg: 'No encontrado' });
     res.json(estudiante);
   } catch (e) {
