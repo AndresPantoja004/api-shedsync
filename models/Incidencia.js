@@ -1,8 +1,4 @@
 const { sequelize, DataTypes } = require('../database/db_conection');
-const Usuario = require('./Usuario');
-const Aula = require('./Aula');
-const Laboratorio = require('./Laboratorio');
-const Equipo = require('./Equipo');
 
 const Incidencia = sequelize.define('Incidencia', {
   id_incidencia: {
@@ -24,10 +20,5 @@ const Incidencia = sequelize.define('Incidencia', {
   tableName: 'incidencia',
   timestamps: false,
 });
-
-Incidencia.belongsTo(Usuario, { foreignKey: 'id_usuario' });
-Incidencia.belongsTo(Aula, { foreignKey: 'id_aula' });
-Incidencia.belongsTo(Laboratorio, { foreignKey: 'id_laboratorio' });
-Incidencia.belongsTo(Equipo, { foreignKey: 'id_equipo' });
 
 module.exports = Incidencia;

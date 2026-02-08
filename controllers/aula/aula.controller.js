@@ -1,5 +1,4 @@
-const Aula = require('../../models/Aula');
-const Horario = require('../../models/Horario');
+const { Horario, Aula } = require('../../models');
 const { Op } = require('sequelize');
 
 exports.getAll = async (req, res) => {

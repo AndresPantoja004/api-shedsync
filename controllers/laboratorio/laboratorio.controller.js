@@ -1,6 +1,4 @@
-const Laboratorio = require('../../models/Laboratorio');
-const Equipo = require('../../models/Equipo');
-const Horario = require('../../models/Horario');
+const { Horario, Equipo, Laboratorio } = require('../../models');
 
 exports.getAll = async (req, res) => {
   try {

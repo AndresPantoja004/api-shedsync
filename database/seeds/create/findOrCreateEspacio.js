@@ -1,5 +1,4 @@
-import Laboratorio from "../../../models/Laboratorio.js";
-import Aula from "../../../models/Aula.js";
+import { Aula, Laboratorio } from "../../../models/index.js";
 import { parseEspacio } from "../../parsers/espacio.parser.js";
 
 export const findOrCreateEspacio = async (data) => {

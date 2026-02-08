@@ -1,5 +1,4 @@
 const { sequelize, DataTypes } = require('../database/db_conection');
-const Laboratorio = require('./Laboratorio');
 
 const Equipo = sequelize.define('Equipo', {
   id_equipo: {
@@ -13,7 +12,5 @@ const Equipo = sequelize.define('Equipo', {
   tableName: 'equipo',
   timestamps: false,
 });
-
-Equipo.belongsTo(Laboratorio, { foreignKey: 'id_laboratorio' });
 
 module.exports = Equipo;

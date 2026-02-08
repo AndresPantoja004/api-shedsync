@@ -1,7 +1,4 @@
-const Estudiante = require('../../models/Estudiante');
-const Carrera = require('../../models/Carrera');
-const EstudianteSemestre = require('../../models/EstudianteSemestre');
-const Semestre = require('../../models/Semestre');
+const { Estudiante, Carrera, EstudianteSemestre, Semestre } = require('../../models');
 
 exports.getAll = async (req, res) => {
   try {

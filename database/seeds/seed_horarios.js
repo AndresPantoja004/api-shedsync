@@ -1,6 +1,6 @@
 const { sequelize } = require('../db_conection');
 const parseHorarioExcel = require('../parsers/horario.parser');
-const Horario = require('../../models/Horario');
+const {Horario} = require('../../models/index.js');
 const { findOrCreateProfesor } = require('./create/findOrCreateProfesor');
 const { findOrCreateAsignatura } = require('./create/findOrCreateAsignatura');
 const { findOrCreateEspacio } = require('./create/findOrCreateEspacio');
@@ -13,7 +13,6 @@ async function seedHorarios(file) {
   await sequelize.authenticate();
 
   const data = parseHorarioExcel(file);
-  console.log(data)
 
   const [tipo_carrera] = await findOrCreateTipoCarrera('Presencial');
   const [carrera] = await findOrCreateCarrera(data, tipo_carrera.id_tipo_carrera);

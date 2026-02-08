@@ -1,5 +1,4 @@
-const Incidencia = require('../../models/Incidencia');
-const { Op } = require('sequelize');
+const { Incidencia } = require('../../models');
 
 exports.create = async (req, res) => {
   try {

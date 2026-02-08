@@ -1,5 +1,4 @@
-const Horario = require('../../models/Horario');
-const Asignatura = require('../../models/Asignatura');
+const { Horario, Asignatura } = require('../../models');
 
 exports.getByEstudiante = async (req, res) => {
   try {
