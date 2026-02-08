@@ -1,10 +1,30 @@
-const Carrera = require('../../models/Carrera');
-const TipoCarrera = require('../../models/TipoCarrera');
+const { Semestre, Carrera, TipoCarrera, Asignatura } = require('../../models');
 
 exports.getAll = async (req, res) => {
   try {
     const carreras = await Carrera.findAll({ include: TipoCarrera });
     res.json(carreras);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+};
+
+exports.getAllSemester = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const semestres = await Semestre.findAll({
+      where: { id_carrera: id },
+      include: [{
+        model: Asignatura,
+        as: 'asignaturas'
+      }],
+      order: [
+        ['nivel', 'ASC']
+      ]
+    });
+
+    res.json(semestres);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
