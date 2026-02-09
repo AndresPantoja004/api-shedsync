@@ -1,4 +1,4 @@
-import Profesor from '../../../models/Profesor.js';
+import {Profesor} from '../../../models/index.js';
 
 export const findOrCreateProfesor = async (data) => {
   let profesor = separarNombreCompleto(data);

@@ -1,13 +1,10 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const Usuario = require('../../models/Usuario');
+const { Usuario } = require('../../models');
 
 const SALT_ROUNDS = 10;
-const JWT_SECRET = process.env.JWT_SECRET || 'clave_secreta_super_segura';
+const JWT_SECRET = process.env.JWT_SECRET;
 
-// =======================
-// REGISTRO
-// =======================
 exports.register = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -35,8 +32,18 @@ exports.register = async (req, res) => {
       password_hash: passwordHash,
     });
 
+    const token = jwt.sign(
+      {
+        id_usuario: usuario.id_usuario,
+        email: usuario.email,
+      },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
     return res.status(201).json({
       message: 'Usuario registrado correctamente',
+      token,
       usuario: {
         id_usuario: usuario.id_usuario,
         email: usuario.email,
@@ -51,9 +58,6 @@ exports.register = async (req, res) => {
   }
 };
 
-// =======================
-// LOGIN
-// =======================
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -93,7 +97,7 @@ exports.login = async (req, res) => {
         email: usuario.email,
       },
       JWT_SECRET,
-      { expiresIn: '8h' }
+      { expiresIn: '24h' }
     );
 
     return res.status(200).json({

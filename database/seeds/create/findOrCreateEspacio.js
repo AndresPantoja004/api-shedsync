@@ -1,26 +1,50 @@
-import Laboratorio from "../../../models/Laboratorio.js";
-import Aula from "../../../models/Aula.js";
+import { Aula, Laboratorio } from "../../../models/index.js";
 import { parseEspacio } from "../../parsers/espacio.parser.js";
 
 export const findOrCreateEspacio = async (data) => {
-    const parsed = parseEspacio(data);
+  const parsed = parseEspacio(data);
+  if (!parsed) return null;
 
-    let espacio;
+  if (parsed.tipo === "aula") {
+    const [aula] = await Aula.findOrCreate({
+      where: { codigo: parsed.codigo },
+      defaults: {
+        tipo: "aula",
+        capacidad: parsed.capacidad ?? 30
+      }
+    });
 
-    if (!parsed) return;
+    return { aula };
+  }
 
-    if (parsed.tipo === "laboratorio") {
-        espacio = await Laboratorio.findOrCreate({
-            where: { nombre: parsed.nombre }
-        });
+  if (parsed.tipo === "laboratorio") {
+    let aula = null;
 
-    } else if (parsed.tipo === "aula") {
-        espacio = await Aula.findOrCreate({
-            where: { codigo: parsed.codigo }
-        });
-
-    } else if (parsed.tipo === "virtual") {
-        espacio = { virtual: true };
+    if (parsed.aulaCodigo) {
+      [aula] = await Aula.findOrCreate({
+        where: { codigo: parsed.aulaCodigo },
+        defaults: {
+          tipo: "aula",
+          capacidad: 30
+        }
+      });
     }
-    return espacio;
-}
+
+    const [laboratorio] = await Laboratorio.findOrCreate({
+      where: { nombre: parsed.nombre },
+      defaults: {
+        tipo: "laboratorio",
+        capacidad: parsed.capacidad ?? 25,
+        id_aula: aula?.id_aula ?? null
+      }
+    });
+
+    return { laboratorio, aula };
+  }
+
+  if (parsed.tipo === "virtual") {
+    return { virtual: true };
+  }
+
+  return null;
+};

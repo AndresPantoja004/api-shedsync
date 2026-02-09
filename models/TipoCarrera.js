@@ -1,4 +1,5 @@
 const { sequelize, DataTypes } = require('../database/db_conection');
+
 const TipoCarrera = sequelize.define('TipoCarrera', {
   id_tipo_carrera: {
     type: DataTypes.INTEGER,

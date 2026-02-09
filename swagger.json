@@ -5,10 +5,10 @@
     "description": "Esta API permite gestionar los horarios de todas las carreras de la ESPE Sede Santo Domingo",
     "version": "1.0.0"
   },
-  "host": "localhost:3000",
+  "host": "p01--api-schedsync--k7nq7x6nhfgl.code.run",
   "basePath": "/",
   "schemes": [
-    "http"
+    "https"
   ],
   "paths": {
     "/api/auth/register": {

@@ -1,4 +1,4 @@
-import TipoCarrera from "../../../models/TipoCarrera.js";
+import {TipoCarrera} from "../../../models/index.js";
 
 export const findOrCreateTipoCarrera = async (nombre) => {
   return await TipoCarrera.findOrCreate({
