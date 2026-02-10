@@ -1,4 +1,5 @@
 const { Horario, Equipo, Laboratorio } = require('../../models');
+const { Op } = require('sequelize');
 
 exports.getAll = async (req, res) => {
   try {
@@ -6,6 +7,50 @@ exports.getAll = async (req, res) => {
     res.json(labs);
   } catch (e) {
     res.status(500).json({ error: e.message });
+  }
+};
+
+exports.getDisponibles = async (req, res) => {
+  try {
+    const now = new Date();
+
+    const dias = [
+      'DOMINGO',
+      'LUNES',
+      'MARTES',
+      'MIERCOLES',
+      'JUEVES',
+      'VIERNES',
+      'SABADO'
+    ];
+
+    const diaActual = dias[now.getDay()];
+    const horaActual = now.toTimeString().slice(0, 8);
+
+    const labsOcupados = await Horario.findAll({
+      attributes: ['id_laboratorio'],
+      where: {
+        dia: diaActual,
+        id_laboratorio: { [Op.ne]: null },
+        hora_inicio: { [Op.lte]: horaActual },
+        hora_fin: { [Op.gt]: horaActual }
+      },
+      group: ['id_laboratorio']
+    });
+
+    const idsOcupadas = labsOcupados.map(h => h.id_laboratorio);
+
+    const labsDisponibles = await Laboratorio.findAll({
+      where: {
+        id_laboratorio: idsOcupadas.length
+          ? { [Op.notIn]: idsOcupadas }
+          : { [Op.ne]: null }
+      }
+    });
+
+    res.json(labsDisponibles);;
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -41,18 +86,6 @@ exports.remove = async (req, res) => {
   try {
     await Laboratorio.destroy({ where: { id_laboratorio: req.params.id } });
     res.json({ msg: 'Laboratorio eliminado' });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-};
-
-exports.getDisponibles = async (req, res) => {
-  try {
-    const labs = await Laboratorio.findAll({
-      include: { model: Horario, required: false }
-    });
-    const disponibles = labs.filter(l => l.Horarios?.length === 0);
-    res.json(disponibles);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
