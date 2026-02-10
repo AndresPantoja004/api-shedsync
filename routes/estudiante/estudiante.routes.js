@@ -4,14 +4,14 @@ const controllerEstudiante = require('../../controllers/estudiante/estudiante.co
 const auth = require('../../middlewares/auth.middleware');
 
 // 🔒 Todas estas rutas requieren token
-router.get('/all', auth, controllerEstudiante.getAll);
-router.get('/', auth, controllerEstudiante.getById);
-router.post('/', auth, controllerEstudiante.create);
-router.put('/:id', auth, controllerEstudiante.update);
+router.get('/all', controllerEstudiante.getAll);
+router.get('/', controllerEstudiante.getById);
+router.post('/', controllerEstudiante.create);
+router.put('/:id' , controllerEstudiante.update);
 
 // lógica académica
 router.get('/:id/semestres', controllerEstudiante.getSemestres);
-router.post('/:id/semestres', auth, controllerEstudiante.asignarSemestre);
+router.post('/:id/semestres', controllerEstudiante.asignarSemestre);
 
 
 module.exports = router;

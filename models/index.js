@@ -20,6 +20,10 @@ const Equipo = require('./Equipo');
 const Horario = require('./Horario');
 const Incidencia = require('./Incidencia');
 
+
+//Tipo estudiante
+const TipoEstudiante = require('./TipoEstudiante')
+
 // Usuario - Rol (N:M)
 Usuario.belongsToMany(Rol, {
   through: UsuarioRol,
@@ -56,6 +60,21 @@ Profesor.hasMany(Asignatura, { foreignKey: 'id_profesor' });
 // Estudiante - Carrera
 Estudiante.belongsTo(Carrera, { foreignKey: 'id_carrera' });
 Carrera.hasMany(Estudiante, { foreignKey: 'id_carrera' });
+
+//EstudianteSemestre - TipoEstudiante
+EstudianteSemestre.belongsTo(TipoEstudiante,{foreignKey:'id_tipoestu'});
+TipoEstudiante.hasMany(EstudianteSemestre,{foreignKey:'id_tipoestu'});
+
+
+//Relacion estudiante semestre con asignatura
+EstudianteSemestre.belongsTo(Asignatura, {
+  foreignKey: 'id_asignatura'
+});
+
+Asignatura.hasMany(EstudianteSemestre, {
+  foreignKey: 'id_asignatura'
+});
+
 
 // Estudiante - Semestre (N:M)
 Estudiante.belongsToMany(Semestre, {
@@ -111,4 +130,5 @@ module.exports = {
   Equipo,
   Horario,
   Incidencia,
+  TipoEstudiante
 };

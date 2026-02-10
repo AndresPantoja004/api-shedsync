@@ -1,4 +1,4 @@
-const { Estudiante, Carrera, EstudianteSemestre, Semestre } = require('../../models');
+const { Estudiante, Carrera, EstudianteSemestre, Semestre, Asignatura, TipoEstudiante } = require('../../models');
 
 exports.getAll = async (req, res) => {
   try {
@@ -13,8 +13,8 @@ exports.getAll = async (req, res) => {
 exports.getById = async (req, res) => {
   try {
     const idUsuario = req.user.id_usuario;
-    console.log("USUARIO EN GET BY ID:"+ req.user.id_usuario)
-    const estudiante = await Estudiante.findOne({where:{id_usuario: idUsuario}}, { include: Carrera });
+    console.log("USUARIO EN GET BY ID:" + req.user.id_usuario)
+    const estudiante = await Estudiante.findOne({ where: { id_usuario: idUsuario } }, { include: Carrera });
     if (!estudiante) return res.status(404).json({ msg: 'No encontrado' });
     res.json(estudiante);
   } catch (e) {
@@ -42,11 +42,26 @@ exports.update = async (req, res) => {
 
 exports.getSemestres = async (req, res) => {
   try {
-    const semestres = await EstudianteSemestre.findAll({
+    const data = await EstudianteSemestre.findAll({
       where: { id_estudiante: req.params.id },
-      include: Semestre
+      attributes: ['id_estudiante'],
+      include: [
+        {
+          model: Semestre,
+          attributes: ['id_semestre', 'nombre']
+        },
+        {
+          model: Asignatura,
+          attributes: ['id_asignatura', 'nombre']
+        },
+        {
+          model: TipoEstudiante,
+          attributes: ['id_tipoestu', 'descripcion']
+        }
+      ]
     });
-    res.json(semestres);
+
+    res.json(data);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -54,12 +69,18 @@ exports.getSemestres = async (req, res) => {
 
 exports.asignarSemestre = async (req, res) => {
   try {
-    const { id_semestre } = req.body;
-    await EstudianteSemestre.create({
+    const { id_semestre, id_tipoestu, asignaturas } = req.body;
+
+    const data = asignaturas.map(id_asignatura => ({
       id_estudiante: req.params.id,
-      id_semestre
-    });
-    res.json({ msg: 'Semestre asignado' });
+      id_semestre,
+      id_asignatura,
+      id_tipoestu
+    }));
+
+    await EstudianteSemestre.bulkCreate(data);
+
+    res.status(201).json({ msg: 'Asignaturas asignadas correctamente' });
   } catch (e) {
     res.status(400).json({ error: e.message });
   }

@@ -3,7 +3,10 @@ const router = express.Router();
 const controller = require('../../controllers/usuario/usuario.controller');
 const auth = require('../../middlewares/auth.middleware');
 
-// Todas estas rutas requieren token
+// Obtener datos del usuario autenticado
 router.get('/', auth, controller.getById);
+
+// Asignar un rol al usuario 
+router.post('/:id/asignar-rol', controller.asignarRol);
 
 module.exports = router;
