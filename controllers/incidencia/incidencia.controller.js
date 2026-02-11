@@ -1,48 +1,52 @@
-const { Incidencia } = require('../../models');
-const { Op } = require('sequelize');
+const { Incidencia, Espacio } = require('../../models');
+const { Op, Sequelize } = require('sequelize');
 
 exports.create = async (req, res) => {
   try {
-    const {tipo, descripcion, estado, id_aula, id_laboratorio, id_equipo} = req.body;
+    const { tipo, descripcion, estado, id_espacio, id_equipo } = req.body;
     const id_usuario = req.user.id_usuario;
 
-    const result = await Incidencia.create({tipo, descripcion, estado, id_usuario, id_aula, id_laboratorio, id_equipo});
+    const result = await Incidencia.create({
+      tipo,
+      descripcion,
+      estado,
+      id_usuario,
+      id_espacio,
+      id_equipo
+    });
+
     res.status(201).json(result);
+
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
-exports.getAulaCount = async (req, res) => {
+exports.getCountByTipo = async (req, res) => {
   try {
+    const { tipo } = req.query;
 
-    const aulas = await Incidencia.count({
-      col: 'id_aula',
+    const incidencias = await Incidencia.findAll({
+      attributes: [
+        [Sequelize.col('Incidencia.id_espacio'), 'id_espacio'],
+        [Sequelize.fn('COUNT', Sequelize.col('Incidencia.id_incidencia')), 'total']
+      ],
+      include: [{
+        model: Espacio,
+        attributes: ['tipo'],
+        where: tipo ? { tipo } : {}
+      }],
       where: {
-        id_aula: { [Op.ne]: null }
+        id_espacio: { [Op.ne]: null }
       },
-      group: ['id_aula']
+      group: [
+        'Incidencia.id_espacio',
+        'Espacio.id_espacio',
+        'Espacio.tipo'
+      ]
     });
 
-    res.json(aulas);
-
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-exports.getLabCount = async (req, res) => {
-  try {
-
-    const laboratorios = await Incidencia.count({
-      col: 'id_laboratorio',
-      where: {
-        id_laboratorio: { [Op.ne]: null }
-      },
-      group: ['id_laboratorio']
-    });
-
-    res.json(laboratorios);
+    res.json(incidencias);
 
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -51,9 +55,15 @@ exports.getLabCount = async (req, res) => {
 
 exports.getById = async (req, res) => {
   try {
-    const incidencia = await Incidencia.findByPk(req.params.id)
+    const incidencia = await Incidencia.findByPk(req.params.id, {
+      include: [{ model: Espacio }]
+    });
+
+    if (!incidencia)
+      return res.status(404).json({ msg: 'Incidencia no encontrada' });
 
     res.json(incidencia);
+
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

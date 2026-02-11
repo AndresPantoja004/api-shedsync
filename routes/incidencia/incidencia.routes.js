@@ -4,8 +4,7 @@ const auth = require('../../middlewares/auth.middleware');
 const incidenciaController = require('../../controllers/incidencia/incidencia.controller');
 
 router.post('/', auth, incidenciaController.create);
-router.get('/aula/count', incidenciaController.getAulaCount);
-router.get('/laboratorio/count', incidenciaController.getLabCount);
+router.get('/count', incidenciaController.getCountByTipo);
 router.get('/:id', incidenciaController.getById);
 
 module.exports = router;

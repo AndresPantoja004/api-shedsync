@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const controller = require('../../controllers/laboratorio/laboratorio.controller');
+const controller = require('../../controllers/espacio/espacio.controller');
 
 router.get('/', controller.getAll);
 router.get('/disponibles', controller.getDisponibles);

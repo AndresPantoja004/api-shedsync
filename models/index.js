@@ -13,12 +13,14 @@ const Profesor = require('./Profesor');
 const Estudiante = require('./Estudiante');
 const EstudianteSemestre = require('./EstudianteSemestre');
 
-const Aula = require('./Aula');
-const Laboratorio = require('./Laboratorio');
+// const Aula = require('./Aula');
+// const Laboratorio = require('./Laboratorio');
+const Espacio = require('./Espacio');
 const Equipo = require('./Equipo');
 
 const Horario = require('./Horario');
 const Incidencia = require('./Incidencia');
+const Reserva = require('./Reserva');
 
 
 //Tipo estudiante
@@ -75,7 +77,6 @@ Asignatura.hasMany(EstudianteSemestre, {
   foreignKey: 'id_asignatura'
 });
 
-
 // Estudiante - Semestre (N:M)
 Estudiante.belongsToMany(Semestre, {
   through: EstudianteSemestre,
@@ -86,29 +87,23 @@ Semestre.belongsToMany(Estudiante, {
   foreignKey: 'id_semestre',
 });
 
-// Laboratorio - Equipo
-Equipo.belongsTo(Laboratorio, { foreignKey: 'id_laboratorio' });
-Laboratorio.hasMany(Equipo, { foreignKey: 'id_laboratorio' });
+// Espacio - Equipo
+Equipo.belongsTo(Espacio, { foreignKey: 'id_espacio' });
+Espacio.hasMany(Equipo, { foreignKey: 'id_espacio' });
 
 // Horario
 Horario.belongsTo(Asignatura, { foreignKey: 'id_asignatura' });
 Asignatura.hasMany(Horario, { foreignKey: 'id_asignatura' });
 
-Horario.belongsTo(Aula, { foreignKey: 'id_aula' });
-Aula.hasMany(Horario, { foreignKey: 'id_aula' });
-
-Horario.belongsTo(Laboratorio, { foreignKey: 'id_laboratorio' });
-Laboratorio.hasMany(Horario, { foreignKey: 'id_laboratorio' });
+Horario.belongsTo(Espacio, { foreignKey: 'id_espacio' });
+Espacio.hasMany(Horario, { foreignKey: 'id_espacio' });
 
 // Incidencia
 Incidencia.belongsTo(Usuario, { foreignKey: 'id_usuario' });
 Usuario.hasMany(Incidencia, { foreignKey: 'id_usuario' });
 
-Incidencia.belongsTo(Aula, { foreignKey: 'id_aula' });
-Aula.hasMany(Incidencia, { foreignKey: 'id_aula' });
-
-Incidencia.belongsTo(Laboratorio, { foreignKey: 'id_laboratorio' });
-Laboratorio.hasMany(Incidencia, { foreignKey: 'id_laboratorio' });
+Incidencia.belongsTo(Espacio, { foreignKey: 'id_espacio' });
+Espacio.hasMany(Incidencia, { foreignKey: 'id_espacio' });
 
 Incidencia.belongsTo(Equipo, { foreignKey: 'id_equipo' });
 Equipo.hasMany(Incidencia, { foreignKey: 'id_equipo' });
@@ -125,10 +120,10 @@ module.exports = {
   Profesor,
   Estudiante,
   EstudianteSemestre,
-  Aula,
-  Laboratorio,
+  Espacio,
   Equipo,
   Horario,
   Incidencia,
-  TipoEstudiante
+  TipoEstudiante,
+  Reserva
 };
