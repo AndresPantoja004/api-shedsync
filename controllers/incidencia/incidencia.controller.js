@@ -2,8 +2,9 @@ const { Incidencia } = require('../../models');
 
 exports.create = async (req, res) => {
   try {
-    const incidencia = await Incidencia.create(req.body);
-    res.status(201).json(incidencia);
+    const {tipo, descripcion, estado, id_usuario, id_aula, id_laboratorio, id_equipo} = req.body;
+    const result = await Incidencia.create({tipo, descripcion, estado, id_usuario, id_aula, id_laboratorio, id_equipo});
+    res.status(201).json(result);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
