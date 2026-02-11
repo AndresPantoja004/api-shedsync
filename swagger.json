@@ -117,6 +117,11 @@
         "description": "",
         "parameters": [
           {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
             "name": "body",
             "in": "body",
             "schema": {
@@ -129,9 +134,6 @@
                   "example": "any"
                 },
                 "estado": {
-                  "example": "any"
-                },
-                "id_usuario": {
                   "example": "any"
                 },
                 "id_aula": {
@@ -153,11 +155,27 @@
           },
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
     },
-    "/api/incidencia/reporte": {
+    "/api/incidencia/aula/count": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/incidencia/laboratorio/count": {
       "get": {
         "description": "",
         "responses": {
