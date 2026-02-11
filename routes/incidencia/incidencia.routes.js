@@ -6,6 +6,6 @@ const incidenciaController = require('../../controllers/incidencia/incidencia.co
 router.post('/', auth, incidenciaController.create);
 router.get('/aula/count', incidenciaController.getAulaCount);
 router.get('/laboratorio/count', incidenciaController.getLabCount);
-router.get('/criticas', incidenciaController.getCriticas);
+router.get('/:id', incidenciaController.getById);
 
 module.exports = router;

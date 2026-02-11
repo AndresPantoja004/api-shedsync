@@ -49,17 +49,11 @@ exports.getLabCount = async (req, res) => {
   }
 };
 
-exports.getCriticas = async (req, res) => {
+exports.getById = async (req, res) => {
   try {
-    const criticas = await Incidencia.findAll({
-      where: {
-        estado: 'Reportado'
-      },
-      having: Incidencia.sequelize.literal('COUNT(*) >= 3'),
-      group: ['id_aula', 'id_laboratorio']
-    });
+    const incidencia = await Incidencia.findByPk(req.params.id)
 
-    res.json(criticas);
+    res.json(incidencia);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
