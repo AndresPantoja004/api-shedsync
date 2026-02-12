@@ -81,9 +81,7 @@ exports.asignarSemestre = async (req, res) => {
     console.log(req.body);
     console.log("ID ESTUDIANTE DESDE API: ", req.params.id)
 
-    await EstudianteSemestre.bulkCreate(data, {
-      ignoreDuplicates: true
-    });
+    await EstudianteSemestre.bulkCreate(data);
 
     res.status(201).json({ msg: 'Asignaturas asignadas correctamente' });
   } catch (e) {

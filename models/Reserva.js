@@ -6,7 +6,7 @@ const Reserva = sequelize.define('Reserva', {
     primaryKey: true,
     autoIncrement: true
   },
-  id_laboratorio: {
+  id_espacio: {
     type: DataTypes.INTEGER,
     allowNull: false
   },
@@ -26,6 +26,10 @@ const Reserva = sequelize.define('Reserva', {
     type: DataTypes.ENUM('PENDIENTE', 'APROBADA', 'CANCELADA'),
     defaultValue: 'PENDIENTE'
   }
+},{
+  tableName: 'reserva',
+  timestamps: false,
 });
+
 
 module.exports = Reserva;

@@ -1,4 +1,4 @@
-const { Horario, Asignatura, EstudianteSemestre } = require('../../models');
+const { Horario, Asignatura, EstudianteSemestre, Espacio } = require('../../models');
 
 exports.getByEstudiante = async (req, res) => {
   try {
@@ -30,36 +30,63 @@ exports.obtenerHorarioEstudiante = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // 1️⃣ Obtener asignaturas del estudiante
-    const registros = await EstudianteSemestre.findAll({
-      where: { id_estudiante: id },
-      attributes: ['id_asignatura']
-    });
-
-    if (!registros.length) {
-      return res.status(404).json({ msg: 'El estudiante no tiene asignaturas registradas' });
-    }
-
-    const idsAsignaturas = registros.map(r => r.id_asignatura);
-
-    // 2️⃣ Buscar horarios de esas asignaturas
     const horarios = await Horario.findAll({
-      where: {
-        id_asignatura: idsAsignaturas
-      },
       include: [
         {
           model: Asignatura,
-          attributes: ['nombre']
+          attributes: ['nombre'],
+          required: true,
+          include: [
+            {
+              model: EstudianteSemestre,
+              where: { id_estudiante: id },
+              attributes: []
+            }
+          ]
+        },
+        {
+          model: Espacio,
+          attributes: ['nombre', 'tipo', 'capacidad']
         }
       ],
-      order: [['dia', 'ASC'], ['hora_inicio', 'ASC']]
+      order: [
+        ['dia', 'ASC'],
+        ['hora_inicio', 'ASC']
+      ]
     });
 
-    res.json(horarios);
+    // 🔥 ELIMINAR DUPLICADOS
+    const unique = [];
+    const seen = new Set();
+
+    for (const h of horarios) {
+      const key = `${h.dia}-${h.hora_inicio}-${h.hora_fin}-${h.id_asignatura}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        unique.push(h);
+      }
+    }
+
+    const ordenDias = {
+      LUNES: 1,
+      MARTES: 2,
+      MIERCOLES: 3,
+      JUEVES: 4,
+      VIERNES: 5,
+      SABADO: 6
+    };
+
+    unique.sort((a, b) => {
+      if (ordenDias[a.dia] !== ordenDias[b.dia]) {
+        return ordenDias[a.dia] - ordenDias[b.dia];
+      }
+      return a.hora_inicio.localeCompare(b.hora_inicio);
+    });
+
+    res.json(unique);
 
   } catch (error) {
-    console.error(error);
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };

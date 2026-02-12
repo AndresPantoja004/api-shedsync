@@ -1,4 +1,4 @@
-const { Horario, Equipo, Espacio } = require('../../models');
+const { Horario, Equipo, Espacio, Reserva } = require('../../models');
 const { Op } = require('sequelize');
 
 
@@ -24,45 +24,82 @@ exports.getDisponibles = async (req, res) => {
     const now = new Date();
 
     const dias = [
-      'DOMINGO',
-      'LUNES',
-      'MARTES',
-      'MIERCOLES',
-      'JUEVES',
-      'VIERNES',
-      'SABADO'
+      "DOMINGO",
+      "LUNES",
+      "MARTES",
+      "MIERCOLES",
+      "JUEVES",
+      "VIERNES",
+      "SABADO",
     ];
 
     const diaActual = dias[now.getDay()];
     const horaActual = now.toTimeString().slice(0, 8);
+    const fechaActual = now.toISOString().slice(0, 10);
 
-    const espaciosOcupados = await Horario.findAll({
-      attributes: ['id_espacio'],
-      where: {
-        dia: diaActual,
-        hora_inicio: { [Op.lte]: horaActual },
-        hora_fin: { [Op.gt]: horaActual }
-      },
-      group: ['id_espacio']
-    });
-
-    const idsOcupados = espaciosOcupados.map(h => h.id_espacio);
-
-    const where = {
-      id_espacio: idsOcupados.length
-        ? { [Op.notIn]: idsOcupados }
-        : { [Op.ne]: null }
-    };
-
+    // 1️⃣ Filtrar espacios por tipo si existe
+    const whereEspacio = {};
     if (tipo) {
-      where.tipo = tipo;
+      whereEspacio.tipo = tipo;
     }
 
-    const disponibles = await Espacio.findAll({ where });
+    const espacios = await Espacio.findAll({
+      where: whereEspacio,
+      include: [
+        {
+          model: Horario,
+          where: { dia: diaActual },
+          required: false,
+        },
+      ],
+    });
 
-    res.json(disponibles);
+    const resultado = [];
 
+    for (const espacio of espacios) {
+      const horariosProcesados = [];
+
+      for (const h of espacio.Horarios || []) {
+        // Buscar si existe reserva para ese bloque
+        const reserva = await Reserva.findOne({
+          where: {
+            id_espacio: espacio.id_espacio,
+            fecha: fechaActual,
+            estado: "APROBADA", // <--- Cambiado de "ACTIVA" a "APROBADA"
+            hora_inicio: h.hora_inicio,
+            hora_fin: h.hora_fin,
+          },
+        });
+
+        let estado = "DISPONIBLE";
+
+        if (h.hora_fin <= horaActual) {
+          estado = "PASADO";
+        } else if (reserva) {
+          estado = "OCUPADO";
+        }
+
+        horariosProcesados.push({
+          id_horario: h.id_horario,
+          dia: h.dia,
+          hora_inicio: h.hora_inicio,
+          hora_fin: h.hora_fin,
+          estado,
+        });
+      }
+
+      resultado.push({
+        id_espacio: espacio.id_espacio,
+        nombre: espacio.nombre,
+        capacidad: espacio.capacidad,
+        tipo: espacio.tipo,
+        horarios: horariosProcesados,
+      });
+    }
+
+    res.json(resultado);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: error.message });
   }
 };
