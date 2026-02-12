@@ -13,8 +13,6 @@ const Profesor = require('./Profesor');
 const Estudiante = require('./Estudiante');
 const EstudianteSemestre = require('./EstudianteSemestre');
 
-// const Aula = require('./Aula');
-// const Laboratorio = require('./Laboratorio');
 const Espacio = require('./Espacio');
 const Equipo = require('./Equipo');
 

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controllerEstudiante = require('../../controllers/estudiante/estudiante.controller');
-const auth = require('../../middlewares/auth.middleware');
+const {auth} = require('../../middlewares/auth.middleware');
 
 // 🔒 Todas estas rutas requieren token
 router.get('/all', controllerEstudiante.getAll);

@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { Usuario } = require('../../models');
+const { Usuario, UsuarioRol } = require('../../models');
 
 const SALT_ROUNDS = 10;
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -90,11 +90,16 @@ exports.login = async (req, res) => {
       });
     }
 
+    const usuarioRol = await UsuarioRol.findOne({
+      where: { id_usuario: usuario.id_usuario }
+    });
+
     // Crear token
     const token = jwt.sign(
       {
         id_usuario: usuario.id_usuario,
         email: usuario.email,
+        rol: usuarioRol.id_rol,
       },
       JWT_SECRET,
       { expiresIn: '24h' }
