@@ -24,15 +24,14 @@ async function seedHorarios(file) {
     const id_semestre = semestreIdByNivel[parseNivelSemestre(h.periodo)];
     const [profesor] = await findOrCreateProfesor(h.docente);
     const [asignatura] = await findOrCreateAsignatura(h, profesor, id_semestre);
-    const espacio = await findOrCreateEspacio(h.espacio);
-
+    const [espacio] = await findOrCreateEspacio(h.espacio);
+    
     await Horario.create({
       dia: h.dia,
       hora_inicio: h.hora_inicio,
       hora_fin: h.hora_fin,
       id_asignatura: asignatura.id_asignatura,
-      id_aula: espacio?.aula?.id_aula ?? null,
-      id_laboratorio: espacio?.laboratorio?.id_laboratorio ?? null
+      id_espacio: espacio.id_espacio
     });
   }
 

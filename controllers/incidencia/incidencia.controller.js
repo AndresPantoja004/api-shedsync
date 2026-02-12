@@ -1,37 +1,69 @@
-const { Incidencia } = require('../../models');
+const { Incidencia, Espacio } = require('../../models');
+const { Op, Sequelize } = require('sequelize');
 
 exports.create = async (req, res) => {
   try {
-    const incidencia = await Incidencia.create(req.body);
-    res.status(201).json(incidencia);
+    const { tipo, descripcion, estado, id_espacio, id_equipo } = req.body;
+    const id_usuario = req.user.id_usuario;
+
+    const result = await Incidencia.create({
+      tipo,
+      descripcion,
+      estado,
+      id_usuario,
+      id_espacio,
+      id_equipo
+    });
+
+    res.status(201).json(result);
+
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
-exports.getReporte = async (req, res) => {
+exports.getCountByTipo = async (req, res) => {
   try {
-    const reporte = await Incidencia.findAll({
-      attributes: ['id_aula', 'id_laboratorio', [Incidencia.sequelize.fn('COUNT', '*'), 'total']],
-      group: ['id_aula', 'id_laboratorio']
+    const { tipo } = req.query;
+
+    const incidencias = await Incidencia.findAll({
+      attributes: [
+        [Sequelize.col('Incidencia.id_espacio'), 'id_espacio'],
+        [Sequelize.fn('COUNT', Sequelize.col('Incidencia.id_incidencia')), 'total']
+      ],
+      include: [{
+        model: Espacio,
+        attributes: ['tipo'],
+        where: tipo ? { tipo } : {}
+      }],
+      where: {
+        id_espacio: { [Op.ne]: null }
+      },
+      group: [
+        'Incidencia.id_espacio',
+        'Espacio.id_espacio',
+        'Espacio.tipo'
+      ]
     });
-    res.json(reporte);
+
+    res.json(incidencias);
+
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-exports.getCriticas = async (req, res) => {
+exports.getById = async (req, res) => {
   try {
-    const criticas = await Incidencia.findAll({
-      where: {
-        estado: 'Reportado'
-      },
-      having: Incidencia.sequelize.literal('COUNT(*) >= 3'),
-      group: ['id_aula', 'id_laboratorio']
+    const incidencia = await Incidencia.findByPk(req.params.id, {
+      include: [{ model: Espacio }]
     });
 
-    res.json(criticas);
+    if (!incidencia)
+      return res.status(404).json({ msg: 'Incidencia no encontrada' });
+
+    res.json(incidencia);
+
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
