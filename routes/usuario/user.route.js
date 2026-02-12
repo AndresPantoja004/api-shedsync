@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../../controllers/usuario/usuario.controller');
-const auth = require('../../middlewares/auth.middleware');
+const {auth} = require('../../middlewares/auth.middleware');
 
 // Obtener datos del usuario autenticado
 router.get('/', auth, controller.getById);
