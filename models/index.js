@@ -94,6 +94,10 @@ Laboratorio.hasMany(Equipo, { foreignKey: 'id_laboratorio' });
 Horario.belongsTo(Asignatura, { foreignKey: 'id_asignatura' });
 Asignatura.hasMany(Horario, { foreignKey: 'id_asignatura' });
 
+
+Horario.belongsTo(EstudianteSemestre, { foreignKey: 'id_asignatura' });
+EstudianteSemestre.hasMany(Horario, { foreignKey: 'id_asignatura' });
+
 Horario.belongsTo(Aula, { foreignKey: 'id_aula' });
 Aula.hasMany(Horario, { foreignKey: 'id_aula' });
 

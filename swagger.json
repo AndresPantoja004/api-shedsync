@@ -5,10 +5,10 @@
     "description": "Esta API permite gestionar los horarios de todas las carreras de la ESPE Sede Santo Domingo",
     "version": "1.0.0"
   },
-  "host": "p01--api-schedsync--k7nq7x6nhfgl.code.run",
+  "host": "localhost:3000",
   "basePath": "/",
   "schemes": [
-    "https"
+    "http"
   ],
   "paths": {
     "/api/auth/register": {
@@ -154,6 +154,27 @@
     "/api/horario/estudiante/{id}": {
       "get": {
         "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/horario/{id}/estudiante": {
+      "get": {
+        "description": "Obtener el horario de un estudiante",
         "parameters": [
           {
             "name": "id",

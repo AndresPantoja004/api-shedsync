@@ -5,7 +5,7 @@ const auth = require('../../middlewares/auth.middleware');
 
 // 🔒 Todas estas rutas requieren token
 router.get('/all', controllerEstudiante.getAll);
-router.get('/', controllerEstudiante.getById);
+router.get('/',auth, controllerEstudiante.getById);
 router.post('/', controllerEstudiante.create);
 router.put('/:id' , controllerEstudiante.update);
 

@@ -69,16 +69,21 @@ exports.getSemestres = async (req, res) => {
 
 exports.asignarSemestre = async (req, res) => {
   try {
-    const { id_semestre, id_tipoestu, asignaturas } = req.body;
+    const {id_tipoestu, asignaturas } = req.body;
 
-    const data = asignaturas.map(id_asignatura => ({
+    const data = asignaturas.map(item => ({
       id_estudiante: req.params.id,
-      id_semestre,
-      id_asignatura,
+      id_semestre: item.id_semestre,
+      id_asignatura: item.id_asignatura,
       id_tipoestu
     }));
 
-    await EstudianteSemestre.bulkCreate(data);
+    console.log(req.body);
+    console.log("ID ESTUDIANTE DESDE API: ", req.params.id)
+
+    await EstudianteSemestre.bulkCreate(data, {
+      ignoreDuplicates: true
+    });
 
     res.status(201).json({ msg: 'Asignaturas asignadas correctamente' });
   } catch (e) {
