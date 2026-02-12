@@ -12,4 +12,8 @@ router.delete('/:id', controller.remove);
 // equipos
 router.get('/:id/equipos', controller.getEquipos);
 
+// reservas
+router.post('/reservar', controller.reservar);
+
+
 module.exports = router;

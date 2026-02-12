@@ -1,6 +1,15 @@
-const { Horario, Equipo, Espacio } = require('../../models');
+const { Horario, Equipo, Espacio, Reserva } = require('../../models');
 const { Op } = require('sequelize');
 
+const dias = [
+  'DOMINGO',
+  'LUNES',
+  'MARTES',
+  'MIERCOLES',
+  'JUEVES',
+  'VIERNES',
+  'SABADO'
+];
 
 exports.getAll = async (req, res) => {
   try {
@@ -16,22 +25,11 @@ exports.getAll = async (req, res) => {
   }
 };
 
-
 exports.getDisponibles = async (req, res) => {
   try {
     const { tipo } = req.query;
 
     const now = new Date();
-
-    const dias = [
-      'DOMINGO',
-      'LUNES',
-      'MARTES',
-      'MIERCOLES',
-      'JUEVES',
-      'VIERNES',
-      'SABADO'
-    ];
 
     const diaActual = dias[now.getDay()];
     const horaActual = now.toTimeString().slice(0, 8);
@@ -138,5 +136,56 @@ exports.getEquipos = async (req, res) => {
 
   } catch (e) {
     res.status(500).json({ error: e.message });
+  }
+};
+
+exports.reservar = async (req, res) => {
+  try {
+    const { id_espacio, hora_inicio, hora_fin } = req.body;
+    const fecha = new Date(req.body.fecha);
+
+    if (hora_inicio >= hora_fin) {
+      return res.status(400).json({ error: "Rango de horas inválido" });
+    }
+
+    const conflictoHorario = await Horario.findOne({
+      where: {
+        id_espacio,
+        dia: dias[fecha.getUTCDay()],
+        hora_inicio: { [Op.lt]: hora_fin },
+        hora_fin: { [Op.gt]: hora_inicio }
+      }
+    });
+
+    if (conflictoHorario) {
+      return res.status(400).json({ error: "Conflicto con horario fijo" });
+    }
+
+    const conflictoReserva = await Reserva.findOne({
+      where: {
+        id_espacio,
+        fecha,
+        estado: { [Op.ne]: 'CANCELADA' },
+        hora_inicio: { [Op.lt]: hora_fin },
+        hora_fin: { [Op.gt]: hora_inicio }
+      }
+    });
+
+    if (conflictoReserva) {
+      return res.status(400).json({ error: "Ya existe una reserva en ese rango" });
+    }
+
+    const reserva = await Reserva.create({
+      id_espacio,
+      fecha,
+      hora_inicio,
+      hora_fin,
+      estado: 'PENDIENTE'
+    });
+
+    res.status(201).json(reserva);
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };

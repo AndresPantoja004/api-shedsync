@@ -226,6 +226,45 @@
         }
       }
     },
+    "/api/espacio/reservar": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "fecha": {
+                  "example": "any"
+                },
+                "id_espacio": {
+                  "example": "any"
+                },
+                "hora_inicio": {
+                  "example": "any"
+                },
+                "hora_fin": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/api/incidencia/": {
       "post": {
         "description": "",
