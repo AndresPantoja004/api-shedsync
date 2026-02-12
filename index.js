@@ -15,6 +15,7 @@ const carrera = require('./routes/carrera/carrera.routes');
 const estudiante = require('./routes/estudiante/estudiante.routes');
 const espacio = require('./routes/espacio/espacio.routes')
 const usuario = require('./routes/usuario/user.route');
+const reserva = require("./routes/reserva/reserva.routes");
 
 app.use(express.json());
 app.use(cors());
@@ -27,6 +28,7 @@ app.use('/api/horario', horario);
 app.use('/api/carrera', carrera);
 app.use('/api/estudiante', estudiante);
 app.use('/api/usuario', usuario);
+app.use("/api/reservas", reserva);
 
 const start = async () => {
     try {
