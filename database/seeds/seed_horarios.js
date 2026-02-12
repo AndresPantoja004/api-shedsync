@@ -8,6 +8,7 @@ const { findOrCreateTipoCarrera } = require('./create/findOrCreateTipoCarrera');
 const { findOrCreateCarrera } = require('./create/findOrCreateCarrera');
 const { findOrCreateSemestre } = require('./create/findOrCreateSemestre');
 const { parseNivelSemestre } = require('../parsers/periodo.parser');
+const { seedAdminUser } = require('./seed_adminUser.js');
 
 async function seedHorarios(file) {
   await sequelize.authenticate();
@@ -25,7 +26,7 @@ async function seedHorarios(file) {
     const [profesor] = await findOrCreateProfesor(h.docente);
     const [asignatura] = await findOrCreateAsignatura(h, profesor, id_semestre);
     const [espacio] = await findOrCreateEspacio(h.espacio);
-    
+
     await Horario.create({
       dia: h.dia,
       hora_inicio: h.hora_inicio,
@@ -38,6 +39,8 @@ async function seedHorarios(file) {
   console.log('✅ Horarios cargados automáticamente');
   process.exit(0);
 }
+
+seedAdminUser();
 
 seedHorarios('./database/horarios/HORARIO_BIOT_202551.xlsx');
 seedHorarios('./database/horarios/HORARIO_AGRO_202551.xlsx');
