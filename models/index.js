@@ -106,6 +106,10 @@ Espacio.hasMany(Incidencia, { foreignKey: 'id_espacio' });
 Incidencia.belongsTo(Equipo, { foreignKey: 'id_equipo' });
 Equipo.hasMany(Incidencia, { foreignKey: 'id_equipo' });
 
+// Reservar
+Reserva.belongsTo(Usuario, { foreignKey: 'id_usuario' });
+Usuario.hasMany(Reserva, { foreignKey: 'id_usuario' });
+
 module.exports = {
   sequelize,
   Usuario,

@@ -142,6 +142,7 @@ exports.getEquipos = async (req, res) => {
 exports.reservar = async (req, res) => {
   try {
     const { id_espacio, hora_inicio, hora_fin } = req.body;
+    const id_usuario = req.user.id_usuario;
     const fecha = new Date(req.body.fecha);
 
     if (hora_inicio >= hora_fin) {
@@ -180,10 +181,94 @@ exports.reservar = async (req, res) => {
       fecha,
       hora_inicio,
       hora_fin,
-      estado: 'PENDIENTE'
+      estado: 'PENDIENTE',
+      id_usuario
     });
 
     res.status(201).json(reserva);
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.updateEstadoReserva = async (req, res) => {
+  const t = await Reserva.sequelize.transaction();
+
+  try {
+    const { id } = req.params;
+    const { estado } = req.body;
+
+    const estadosValidos = ['APROBADA', 'CANCELADA'];
+
+    if (!estadosValidos.includes(estado)) {
+      return res.status(400).json({
+        msg: 'Estado inválido. Solo se permite APROBADA o CANCELADA'
+      });
+    }
+
+    const reserva = await Reserva.findByPk(id, { transaction: t });
+
+    if (!reserva) {
+      await t.rollback();
+      return res.status(404).json({ msg: 'Reserva no encontrada' });
+    }
+
+    if (reserva.estado !== 'PENDIENTE') {
+      await t.rollback();
+      return res.status(400).json({
+        msg: 'Solo se pueden modificar reservas en estado PENDIENTE'
+      });
+    }
+
+    if (estado === 'APROBADA') {
+      const conflicto = await Reserva.findOne({
+        where: {
+          id_espacio: reserva.id_espacio,
+          fecha: reserva.fecha,
+          estado: 'APROBADA',
+          hora_inicio: { [Op.lt]: reserva.hora_fin },
+          hora_fin: { [Op.gt]: reserva.hora_inicio }
+        },
+        transaction: t
+      });
+
+      if (conflicto) {
+        await t.rollback();
+        return res.status(409).json({
+          msg: 'Conflicto de horario. Ya existe una reserva aprobada en ese rango.'
+        });
+      }
+
+      reserva.fecha_aprobacion = new Date();
+      reserva.aprobado_por = req.user.id_usuario;
+    }
+
+    reserva.estado = estado;
+    await reserva.save({ transaction: t });
+
+    await t.commit();
+
+    res.json({
+      msg: `Reserva ${estado} correctamente`,
+      reserva
+    });
+
+  } catch (error) {
+    await t.rollback();
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getPendientes = async (req, res) => {
+  try {
+
+    const reservas = await Reserva.findAll({
+      where: { estado: 'PENDIENTE' },
+      order: [['fecha', 'ASC'], ['hora_inicio', 'ASC']]
+    });
+
+    res.json(reservas);
 
   } catch (error) {
     res.status(500).json({ error: error.message });

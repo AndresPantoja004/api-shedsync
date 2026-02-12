@@ -1,19 +1,22 @@
 const express = require('express');
 const router = express.Router();
-const controller = require('../../controllers/espacio/espacio.controller');
+const espacioController = require('../../controllers/espacio/espacio.controller');
+const { auth, onlyAdmin } = require('../../middlewares/auth.middleware');
 
-router.get('/', controller.getAll);
-router.get('/disponibles', controller.getDisponibles);
-router.get('/:id', controller.getById);
-router.post('/', controller.create);
-router.put('/:id', controller.update);
-router.delete('/:id', controller.remove);
+router.get('/', espacioController.getAll);
+router.get('/disponibles', espacioController.getDisponibles);
+router.get('/:id', espacioController.getById);
+router.post('/', espacioController.create);
+router.put('/:id', espacioController.update);
+router.delete('/:id', espacioController.remove);
+router.get('/:id/equipos', espacioController.getEquipos);
 
-// equipos
-router.get('/:id/equipos', controller.getEquipos);
+// user
+router.post('/reservar', auth, espacioController.reservar);
 
-// reservas
-router.post('/reservar', controller.reservar);
+// Admin
+router.patch('/reservar/:id/estado', auth, onlyAdmin, espacioController.updateEstadoReserva);
+router.get('/reservar/pendientes', auth, onlyAdmin, espacioController.getPendientes);
 
 
 module.exports = router;
