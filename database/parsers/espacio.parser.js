@@ -9,7 +9,7 @@ export function parseEspacio(raw) {
 
   if (texto.includes("VIRTUAL") || texto.includes("EN LINEA")) {
     return {
-      tipo: "virtual",
+      tipo: "VIRTUAL",
       nombre: "VIRTUAL",
       capacidad: null
     };
@@ -19,28 +19,28 @@ export function parseEspacio(raw) {
 
   const matchAula = texto.match(/AULA\s*([A-Z]?)-?(\d+)/);
 
-  const aulaCodigo = matchAula
+  const aulaNombre = matchAula
     ? `${matchAula[1] || "A"}${matchAula[2].padStart(2, "0")}`
     : null;
 
   if (isLab) {
     return {
-      tipo: "laboratorio",
+      tipo: "LABORATORIO",
       nombre: texto,
       capacidad: 25
     };
   }
 
-  if (aulaCodigo) {
+  if (aulaNombre) {
     return {
-      tipo: "aula",
-      codigo: aulaCodigo,
+      tipo: "AULA",
+      nombre: aulaNombre,
       capacidad: 30
     };
   }
 
   return {
-    tipo: "otro",
+    tipo: "OTRO",
     nombre: texto,
     capacidad: null
   };
