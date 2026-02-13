@@ -1,6 +1,4 @@
 const { sequelize, DataTypes } = require('../database/db_conection');
-const Usuario = require('./Usuario');
-const Carrera = require('./Carrera');
 
 const Estudiante = sequelize.define('Estudiante', {
   id_estudiante: {
@@ -18,8 +16,5 @@ const Estudiante = sequelize.define('Estudiante', {
   tableName: 'estudiante',
   timestamps: false,
 });
-
-Estudiante.belongsTo(Usuario, { foreignKey: 'id_usuario' });
-Estudiante.belongsTo(Carrera, { foreignKey: 'id_carrera' });
 
 module.exports = Estudiante;

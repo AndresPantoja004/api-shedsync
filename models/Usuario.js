@@ -11,6 +11,11 @@ const Usuario = sequelize.define('Usuario', {
     allowNull: false,
     unique: true,
   },
+  phone: {
+    type: DataTypes.STRING(15),
+    allowNull: true,
+    defaultValue: null,
+  },
   password_hash: {
     type: DataTypes.TEXT,
     allowNull: false,
@@ -18,6 +23,11 @@ const Usuario = sequelize.define('Usuario', {
   activo: {
     type: DataTypes.BOOLEAN,
     defaultValue: true,
+  },
+  avatar: {
+    type: DataTypes.TEXT('long'), // Soporta strings muy largos de Base64
+    allowNull: true,
+    defaultValue: null,
   },
   fecha_creacion: {
     type: DataTypes.DATE,

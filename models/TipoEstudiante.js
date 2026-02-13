@@ -1,7 +1,7 @@
 const { sequelize, DataTypes } = require('../database/db_conection');
 
-const TipoCarrera = sequelize.define('TipoCarrera', {
-  id_tipo_carrera: {
+const TipoEstudiante = sequelize.define('TipoEstudiante', {
+  id_tipoestu: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
@@ -12,8 +12,8 @@ const TipoCarrera = sequelize.define('TipoCarrera', {
     unique: true,
   },
 }, {
-  tableName: 'tipo_carrera',
+  tableName: 'tipo_estudiante',
   timestamps: false,
 });
 
-module.exports = TipoCarrera;
+module.exports = TipoEstudiante;
