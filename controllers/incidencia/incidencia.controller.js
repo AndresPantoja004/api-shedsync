@@ -124,11 +124,11 @@ exports.updateEstado = async (req, res) => {
     const { estado } = req.body;
 
     // Validar estados permitidos
-    const estadosValidos = ['pendiente', 'revision', 'arreglado'];
+    const estadosValidos = ['reportado', 'matenimiento', 'arreglado'];
 
     if (!estadosValidos.includes(estado)) {
       return res.status(400).json({
-        msg: 'Estado inválido. Use: pendiente, revision o arreglado'
+        msg: 'Estado inválido. Use: reportado, matenimiento o arreglado'
       });
     }
 
