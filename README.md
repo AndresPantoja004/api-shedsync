@@ -317,24 +317,6 @@ docker build -t api-shedsync .
 docker run -p 3000:3000 --env-file .env api-shedsync
 ```
 
-## Contribucion
-
-Las contribuciones al proyecto son bienvenidas. Por favor:
-
-1. Fork el repositorio
-2. Crear una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abrir un Pull Request
-
-## Licencia
-
-Este proyecto esta bajo la licencia ISC. Ver archivo [LICENSE](LICENSE) para mas detalles.
-
-## Autor
-
-Desarrollado por Andres Pantoja
-
 ## Soporte
 
 Para reportar bugs o sugerir mejoras, por favor abre un issue en el repositorio.
