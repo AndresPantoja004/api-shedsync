@@ -121,15 +121,15 @@ exports.getAll = async (req, res) => {
 exports.updateEstado = async (req, res) => {
   try {
     const { id } = req.params;
-    const { estado } = req.body;
+    let { estado } = req.body;
 
-    estado = estado.toLowerCase();
+    estado = estado?.toLowerCase();
 
     const estadosValidos = ['reportado', 'mantenimiento', 'arreglado'];
 
-    if (!estadosValidos.includes(estado)) {
+    if (!estado || !estadosValidos.includes(estado)) {
       return res.status(400).json({
-        msg: 'Estado inválido. Use: reportado, mantenimiento o arreglado'
+        msg: 'Estado inválido'
       });
     }
 
@@ -150,6 +150,7 @@ exports.updateEstado = async (req, res) => {
     });
 
   } catch (error) {
+    console.error("ERROR REAL:", error);
     res.status(500).json({ error: error.message });
   }
 };
