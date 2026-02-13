@@ -123,12 +123,13 @@ exports.updateEstado = async (req, res) => {
     const { id } = req.params;
     const { estado } = req.body;
 
-    // Validar estados permitidos
-    const estadosValidos = ['reportado', 'matenimiento', 'arreglado'];
+    estado = estado.toLowerCase();
+
+    const estadosValidos = ['reportado', 'mantenimiento', 'arreglado'];
 
     if (!estadosValidos.includes(estado)) {
       return res.status(400).json({
-        msg: 'Estado inválido. Use: reportado, matenimiento o arreglado'
+        msg: 'Estado inválido. Use: reportado, mantenimiento o arreglado'
       });
     }
 
