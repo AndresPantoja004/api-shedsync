@@ -8,8 +8,8 @@ const doc = {
         title: 'API de SchedSync',
         description: 'Esta API permite gestionar los horarios de todas las carreras de la ESPE Sede Santo Domingo',
     },
-    host: 'localhost:3000',
-    schemes: ['http']
+    host: 'p01--api-schedsync--k7nq7x6nhfgl.code.run',
+    schemes: ['https']
 }
 
 
