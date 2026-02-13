@@ -75,7 +75,7 @@ exports.getById = async (req, res) => {
 
 exports.getAll = async (req, res) => {
   try {
-    const { estado, tipo } = req.query;
+    const { estado, tipo, fechaDesde, fechaHasta } = req.query;
 
     const whereCondition = {};
 
@@ -83,18 +83,36 @@ exports.getAll = async (req, res) => {
       whereCondition.estado = estado;
     }
 
+    if (fechaDesde && fechaHasta) {
+      whereCondition.fecha = {
+        [Op.between]: [
+          new Date(fechaDesde + ' 00:00:00'),
+          new Date(fechaHasta + ' 23:59:59'),
+        ],
+      };
+    } else if (fechaDesde) {
+      whereCondition.fecha = {
+        [Op.gte]: new Date(fechaDesde + ' 00:00:00'),
+      };
+    } else if (fechaHasta) {
+      whereCondition.fecha = {
+        [Op.lte]: new Date(fechaHasta + ' 23:59:59'),
+      };
+    }
+
     const incidencias = await Incidencia.findAll({
       where: whereCondition,
-      include: [{
-        model: Espacio,
-        attributes: ['id_espacio', 'nombre', 'tipo'],
-        where: tipo ? { tipo } : undefined
-      }],
-      order: [['fecha', 'DESC']]
+      include: [
+        {
+          model: Espacio,
+          attributes: ['id_espacio', 'nombre', 'tipo'],
+          where: tipo ? { tipo } : undefined,
+        },
+      ],
+      order: [['fecha', 'DESC']],
     });
 
     res.json(incidencias);
-
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
