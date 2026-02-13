@@ -1,39 +1,156 @@
-const Incidencia = require('../../models/Incidencia');
-const { Op } = require('sequelize');
+const { Incidencia, Espacio } = require('../../models');
+const { Op, Sequelize } = require('sequelize');
 
 exports.create = async (req, res) => {
   try {
-    const incidencia = await Incidencia.create(req.body);
-    res.status(201).json(incidencia);
+    const { tipo, descripcion, imagen, estado, id_espacio, id_equipo } = req.body;
+    
+    // El id_usuario ya lo tienes del middleware de autenticación
+    const id_usuario = req.user.id_usuario; 
+
+    const result = await Incidencia.create({
+      tipo,
+      descripcion,
+      imagen, // Asegúrate de que el modelo use DataTypes.TEXT('long')
+      estado: estado || 'Reportado', // Valor por defecto si no viene en el body
+      id_usuario,
+      id_espacio: parseInt(id_espacio),
+      id_equipo: id_equipo ? parseInt(id_equipo) : null
+    });
+
+    res.status(201).json(result);
+
   } catch (error) {
+    console.error("Error al crear incidencia:", error);
     res.status(400).json({ error: error.message });
   }
 };
 
-exports.getReporte = async (req, res) => {
+exports.getCountByTipo = async (req, res) => {
   try {
-    const reporte = await Incidencia.findAll({
-      attributes: ['id_aula', 'id_laboratorio', [Incidencia.sequelize.fn('COUNT', '*'), 'total']],
-      group: ['id_aula', 'id_laboratorio']
+    const { tipo } = req.query;
+
+    const incidencias = await Incidencia.findAll({
+      attributes: [
+        [Sequelize.col('Incidencia.id_espacio'), 'id_espacio'],
+        [Sequelize.fn('COUNT', Sequelize.col('Incidencia.id_incidencia')), 'total']
+      ],
+      include: [{
+        model: Espacio,
+        attributes: ['tipo'],
+        where: tipo ? { tipo } : {}
+      }],
+      where: {
+        id_espacio: { [Op.ne]: null }
+      },
+      group: [
+        'Incidencia.id_espacio',
+        'Espacio.id_espacio',
+        'Espacio.tipo'
+      ]
     });
-    res.json(reporte);
+
+    res.json(incidencias);
+
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-exports.getCriticas = async (req, res) => {
+exports.getById = async (req, res) => {
   try {
-    const criticas = await Incidencia.findAll({
-      where: {
-        estado: 'Reportado'
-      },
-      having: Incidencia.sequelize.literal('COUNT(*) >= 3'),
-      group: ['id_aula', 'id_laboratorio']
+    const incidencia = await Incidencia.findByPk(req.params.id, {
+      include: [{ model: Espacio }]
     });
 
-    res.json(criticas);
+    if (!incidencia)
+      return res.status(404).json({ msg: 'Incidencia no encontrada' });
+
+    res.json(incidencia);
+
   } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getAll = async (req, res) => {
+  try {
+    const { estado, tipo, fechaDesde, fechaHasta } = req.query;
+
+    const whereCondition = {};
+
+    if (estado) {
+      whereCondition.estado = estado;
+    }
+
+    if (fechaDesde && fechaHasta) {
+      whereCondition.fecha = {
+        [Op.between]: [
+          new Date(fechaDesde + ' 00:00:00'),
+          new Date(fechaHasta + ' 23:59:59'),
+        ],
+      };
+    } else if (fechaDesde) {
+      whereCondition.fecha = {
+        [Op.gte]: new Date(fechaDesde + ' 00:00:00'),
+      };
+    } else if (fechaHasta) {
+      whereCondition.fecha = {
+        [Op.lte]: new Date(fechaHasta + ' 23:59:59'),
+      };
+    }
+
+    const incidencias = await Incidencia.findAll({
+      where: whereCondition,
+      include: [
+        {
+          model: Espacio,
+          attributes: ['id_espacio', 'nombre', 'tipo'],
+          where: tipo ? { tipo } : undefined,
+        },
+      ],
+      order: [['fecha', 'DESC']],
+    });
+
+    res.json(incidencias);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.updateEstado = async (req, res) => {
+  try {
+    const { id } = req.params;
+    let { estado } = req.body;
+
+    estado = estado?.toLowerCase();
+
+    const estadosValidos = ['reportado', 'mantenimiento', 'arreglado'];
+
+    if (!estado || !estadosValidos.includes(estado)) {
+      return res.status(400).json({
+        msg: 'Estado inválido'
+      });
+    }
+
+    const incidencia = await Incidencia.findByPk(id);
+
+    if (!incidencia) {
+      return res.status(404).json({
+        msg: 'Incidencia no encontrada'
+      });
+    }
+
+    incidencia.estado = estado;
+    await incidencia.save();
+
+    res.json({
+      msg: 'Estado actualizado correctamente',
+      incidencia
+    });
+
+  } catch (error) {
+    console.error("ERROR REAL:", error);
     res.status(500).json({ error: error.message });
   }
 };

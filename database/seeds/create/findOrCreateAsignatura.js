@@ -1,4 +1,4 @@
-import Asignatura from "../../../models/Asignatura.js";
+import {Asignatura} from "../../../models/index.js";
 
 export const findOrCreateAsignatura = async (data, profesor, id_semestre) => {
   return await Asignatura.findOrCreate({

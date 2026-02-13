@@ -1,8 +1,4 @@
 const { sequelize, DataTypes } = require('../database/db_conection');
-const Usuario = require('./Usuario');
-const Aula = require('./Aula');
-const Laboratorio = require('./Laboratorio');
-const Equipo = require('./Equipo');
 
 const Incidencia = sequelize.define('Incidencia', {
   id_incidencia: {
@@ -12,6 +8,11 @@ const Incidencia = sequelize.define('Incidencia', {
   },
   tipo: DataTypes.STRING,
   descripcion: DataTypes.TEXT,
+  // NUEVO CAMPO PARA LA IMAGEN
+  imagen: {
+    type: DataTypes.TEXT('long'), // Permite guardar strings de hasta 4GB (en MySQL)
+    allowNull: true,
+  },
   estado: {
     type: DataTypes.STRING,
     defaultValue: 'Reportado',
@@ -24,10 +25,5 @@ const Incidencia = sequelize.define('Incidencia', {
   tableName: 'incidencia',
   timestamps: false,
 });
-
-Incidencia.belongsTo(Usuario, { foreignKey: 'id_usuario' });
-Incidencia.belongsTo(Aula, { foreignKey: 'id_aula' });
-Incidencia.belongsTo(Laboratorio, { foreignKey: 'id_laboratorio' });
-Incidencia.belongsTo(Equipo, { foreignKey: 'id_equipo' });
 
 module.exports = Incidencia;

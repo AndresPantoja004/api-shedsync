@@ -1,4 +1,4 @@
-import Carrera from "../../../models/Carrera.js";
+import {Carrera} from "../../../models/index.js";
 
 export const findOrCreateCarrera = async (data, id_tipo_carrera) => {
   const nombre = nombre_carrera(data);

@@ -1,4 +1,4 @@
-const Semestre = require('../../../models/Semestre');
+const {Semestre} = require('../../../models/index.js');
 const { parseNivelSemestre } = require('../../parsers/periodo.parser');
 
 async function findOrCreateSemestre(data, id_carrera) {
