@@ -62,8 +62,8 @@ Estudiante.belongsTo(Carrera, { foreignKey: 'id_carrera' });
 Carrera.hasMany(Estudiante, { foreignKey: 'id_carrera' });
 
 //EstudianteSemestre - TipoEstudiante
-EstudianteSemestre.belongsTo(TipoEstudiante,{foreignKey:'id_tipoestu'});
-TipoEstudiante.hasMany(EstudianteSemestre,{foreignKey:'id_tipoestu'});
+EstudianteSemestre.belongsTo(TipoEstudiante, { foreignKey: 'id_tipoestu' });
+TipoEstudiante.hasMany(EstudianteSemestre, { foreignKey: 'id_tipoestu' });
 
 
 //Relacion estudiante semestre con asignatura
@@ -85,6 +85,14 @@ Semestre.belongsToMany(Estudiante, {
   foreignKey: 'id_semestre',
 });
 
+// Relación Espacio <-> Reserva
+Espacio.hasMany(Reserva, { foreignKey: 'id_espacio' });
+Reserva.belongsTo(Espacio, { foreignKey: 'id_espacio' });
+
+// También asegúrate de tener la de Horario si no la has puesto
+Espacio.hasMany(Horario, { foreignKey: 'id_espacio' });
+Horario.belongsTo(Espacio, { foreignKey: 'id_espacio' });
+
 // Espacio - Equipo
 Equipo.belongsTo(Espacio, { foreignKey: 'id_espacio' });
 Espacio.hasMany(Equipo, { foreignKey: 'id_espacio' });
@@ -105,6 +113,18 @@ Espacio.hasMany(Incidencia, { foreignKey: 'id_espacio' });
 
 Incidencia.belongsTo(Equipo, { foreignKey: 'id_equipo' });
 Equipo.hasMany(Incidencia, { foreignKey: 'id_equipo' });
+
+// Relación Usuario <-> UsuarioRol
+Usuario.hasOne(UsuarioRol, { foreignKey: 'id_usuario' });
+UsuarioRol.belongsTo(Usuario, { foreignKey: 'id_usuario' });
+
+// Relación Usuario <-> Estudiante
+Usuario.hasOne(Estudiante, { foreignKey: 'id_usuario' });
+Estudiante.belongsTo(Usuario, { foreignKey: 'id_usuario' });
+
+// Relación Estudiante <-> Carrera
+Estudiante.belongsTo(Carrera, { foreignKey: 'id_carrera' });
+Carrera.hasMany(Estudiante, { foreignKey: 'id_carrera' });
 
 module.exports = {
   sequelize,

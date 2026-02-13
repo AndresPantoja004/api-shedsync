@@ -1,15 +1,6 @@
 const { Horario, Equipo, Espacio, Reserva } = require('../../models');
 const { Op } = require('sequelize');
 
-const dias = [
-  'DOMINGO',
-  'LUNES',
-  'MARTES',
-  'MIERCOLES',
-  'JUEVES',
-  'VIERNES',
-  'SABADO'
-];
 
 exports.getAll = async (req, res) => {
   try {
@@ -27,77 +18,80 @@ exports.getAll = async (req, res) => {
 
 exports.getDisponibles = async (req, res) => {
   try {
-    const { tipo } = req.query;
+    const { tipo, search } = req.query; // Recibimos el parámetro 'search' para el buscador
 
     const now = new Date();
-
+    const dias = ["DOMINGO", "LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO"];
     const diaActual = dias[now.getDay()];
     const horaActual = now.toTimeString().slice(0, 8);
     const fechaActual = now.toISOString().slice(0, 10);
 
-    // 1️⃣ Filtrar espacios por tipo si existe
+    // 1️⃣ Configurar filtros de búsqueda y tipo
     const whereEspacio = {};
-    if (tipo) {
-      whereEspacio.tipo = tipo;
+    if (tipo) whereEspacio.tipo = tipo;
+    
+    // Filtro por nombre (Buscador)
+    if (search) {
+      whereEspacio.nombre = { [Op.like]: `%${search}%` };
     }
 
+    // 2️⃣ Una sola consulta optimizada con includes anidados
     const espacios = await Espacio.findAll({
       where: whereEspacio,
       include: [
         {
           model: Horario,
           where: { dia: diaActual },
-          required: false,
+          required: false, // Trae el espacio aunque no tenga horario hoy
         },
+        {
+          model: Reserva,
+          where: {
+            fecha: fechaActual,
+            estado: "APROBADA"
+          },
+          required: false // Trae el espacio aunque no tenga reservas hoy
+        }
       ],
+      order: [['nombre', 'ASC']] // Ordenar alfabéticamente
     });
 
-    const resultado = [];
-
-    for (const espacio of espacios) {
-      const horariosProcesados = [];
-
-      for (const h of espacio.Horarios || []) {
-        // Buscar si existe reserva para ese bloque
-        const reserva = await Reserva.findOne({
-          where: {
-            id_espacio: espacio.id_espacio,
-            fecha: fechaActual,
-            estado: "APROBADA", // <--- Cambiado de "ACTIVA" a "APROBADA"
-            hora_inicio: h.hora_inicio,
-            hora_fin: h.hora_fin,
-          },
-        });
+    // 3️⃣ Procesar resultados en memoria (mucho más rápido que consultas en bucle)
+    const resultado = espacios.map(espacio => {
+      const horariosProcesados = (espacio.Horarios || []).map(h => {
+        // Buscamos si hay una reserva que coincida con este bloque horario
+        const tieneReserva = (espacio.Reservas || []).some(r => 
+          r.hora_inicio === h.hora_inicio && r.hora_fin === h.hora_fin
+        );
 
         let estado = "DISPONIBLE";
-
         if (h.hora_fin <= horaActual) {
           estado = "PASADO";
-        } else if (reserva) {
+        } else if (tieneReserva) {
           estado = "OCUPADO";
         }
 
-        horariosProcesados.push({
+        return {
           id_horario: h.id_horario,
           dia: h.dia,
           hora_inicio: h.hora_inicio,
           hora_fin: h.hora_fin,
           estado,
-        });
-      }
+        };
+      });
 
-      resultado.push({
+      return {
         id_espacio: espacio.id_espacio,
         nombre: espacio.nombre,
         capacidad: espacio.capacidad,
         tipo: espacio.tipo,
         horarios: horariosProcesados,
-      });
-    }
+      };
+    });
 
     res.json(resultado);
   } catch (error) {
-    console.error(error);
+    console.error('Error al obtener aulas:', error);
     res.status(500).json({ error: error.message });
   }
 };

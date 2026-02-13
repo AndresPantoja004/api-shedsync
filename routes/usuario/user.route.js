@@ -8,5 +8,7 @@ router.get('/', auth, controller.getById);
 
 // Asignar un rol al usuario 
 router.post('/:id/asignar-rol', controller.asignarRol);
+// Actualizar datos de usuario
+router.put('/perfil',auth, controller.updatePerfil);
 
 module.exports = router;

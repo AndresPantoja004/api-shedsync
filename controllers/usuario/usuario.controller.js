@@ -10,12 +10,71 @@ exports.getById = async (req, res) => {
   try {
     const idUsuario = req.user.id_usuario;
 
-    console.log("USUARIO EN GET BY ID:" + req.user.id_usuario)
-    const usuario = await Usuario.findOne({ where: { id_usuario: idUsuario } }, { include: [Estudiante, EstudianteSemestre, Semestre] });
+    const usuario = await Usuario.findOne({
+      where: { id_usuario: idUsuario },
+      include: [
+        {
+          model: Estudiante,
+          include: [Carrera] // Trae el nombre de la carrera
+        },
+        {
+          model: EstudianteSemestre,
+          include: [Semestre] // Trae el semestre actual
+        }
+      ]
+    });
+
     if (!usuario) return res.status(404).json({ msg: 'No encontrado' });
+
     res.json(usuario);
   } catch (e) {
     res.status(500).json({ error: e.message });
+  }
+};
+
+
+//Actaulizar datos:
+// exports.updatePerfil en tu auth.controller.js
+
+exports.updatePerfil = async (req, res) => {
+  try {
+    const idUsuario = req.user.id_usuario; // Obtenido del token
+    const { avatar, phone } = req.body;
+
+    // Buscar el usuario
+    const usuario = await Usuario.findByPk(idUsuario);
+    if (!usuario) {
+      return res.status(404).json({ msg: 'Usuario no encontrado' });
+    }
+
+    // Preparar datos para actualización
+    const datosActualizar = {};
+
+    if (avatar) {
+      datosActualizar.avatar = avatar; // String Base64
+    }
+
+    if (phone) {
+      // Limpiamos el número por si tiene símbolos
+      datosActualizar.phone = phone.replace(/\D/g, '');
+    }
+
+    // Actualizar en la base de datos
+    await usuario.update(datosActualizar);
+
+    res.json({
+      msg: 'Perfil actualizado correctamente',
+      usuario: {
+        id_usuario: usuario.id_usuario,
+        email: usuario.email,
+        phone: usuario.phone,
+        avatar: usuario.avatar // Enviamos el nuevo avatar de vuelta
+      }
+    });
+
+  } catch (error) {
+    console.error('Error al actualizar perfil:', error);
+    res.status(500).json({ error: error.message });
   }
 };
 

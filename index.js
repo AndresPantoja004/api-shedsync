@@ -7,6 +7,10 @@ const { sequelize  } = require('./database/db_conection');
 const swaggerUI = require('swagger-ui-express');
 const swaggerDocumentation = require('./swagger.json');
 
+// Configura el límite (ejemplo: 50MB para soportar el Base64 de la imagen)
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
 
 const auth = require('./routes/auth/auth.routes');
 const incidencia = require('./routes/incidencia/incidencia.routes');

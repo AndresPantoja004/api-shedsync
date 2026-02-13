@@ -8,6 +8,11 @@ const Incidencia = sequelize.define('Incidencia', {
   },
   tipo: DataTypes.STRING,
   descripcion: DataTypes.TEXT,
+  // NUEVO CAMPO PARA LA IMAGEN
+  imagen: {
+    type: DataTypes.TEXT('long'), // Permite guardar strings de hasta 4GB (en MySQL)
+    allowNull: true,
+  },
   estado: {
     type: DataTypes.STRING,
     defaultValue: 'Reportado',

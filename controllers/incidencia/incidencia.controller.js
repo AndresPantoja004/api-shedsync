@@ -3,21 +3,25 @@ const { Op, Sequelize } = require('sequelize');
 
 exports.create = async (req, res) => {
   try {
-    const { tipo, descripcion, estado, id_espacio, id_equipo } = req.body;
-    const id_usuario = req.user.id_usuario;
+    const { tipo, descripcion, imagen, estado, id_espacio, id_equipo } = req.body;
+    
+    // El id_usuario ya lo tienes del middleware de autenticación
+    const id_usuario = req.user.id_usuario; 
 
     const result = await Incidencia.create({
       tipo,
       descripcion,
-      estado,
+      imagen, // Asegúrate de que el modelo use DataTypes.TEXT('long')
+      estado: estado || 'Reportado', // Valor por defecto si no viene en el body
       id_usuario,
-      id_espacio,
-      id_equipo
+      id_espacio: parseInt(id_espacio),
+      id_equipo: id_equipo ? parseInt(id_equipo) : null
     });
 
     res.status(201).json(result);
 
   } catch (error) {
+    console.error("Error al crear incidencia:", error);
     res.status(400).json({ error: error.message });
   }
 };
