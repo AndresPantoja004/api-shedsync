@@ -2,17 +2,26 @@ const { Horario, Equipo, Espacio, Reserva } = require('../../models');
 const { Op } = require('sequelize');
 
 
+// controllers/espacio/espacio.controller.js
 exports.getAll = async (req, res) => {
   try {
-    const { tipo } = req.query;
+    const { search, tipo } = req.query;
+    const where = {};
 
-    const where = tipo ? { tipo } : {};
+    if (tipo) where.tipo = tipo;
+    if (search) {
+      where.nombre = { [Op.like]: `%${search}%` };
+    }
 
-    const espacios = await Espacio.findAll({ where });
+    const espacios = await Espacio.findAll({
+      where,
+      order: [['nombre', 'ASC']],
+      attributes: ['id_espacio', 'nombre', 'tipo', 'capacidad']
+    });
+
     res.json(espacios);
-
-  } catch (e) {
-    res.status(500).json({ error: e.message });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
 
