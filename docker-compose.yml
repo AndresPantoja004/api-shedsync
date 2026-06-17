@@ -1,0 +1,185 @@
+# ShedSync · arquitectura de microservicios (scaffold ejecutable)
+# Cada servicio tiene SU PROPIA base de datos Postgres (database-per-service).
+# El gateway es el único punto de entrada público (puerto 8080).
+
+services:
+  # ---------------- Infraestructura compartida ----------------
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    ports: ["5672:5672", "15672:15672"]   # 15672 = panel web (guest/guest)
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # ---------------- identity ----------------
+  identity-db:
+    image: postgres:16-alpine
+    environment: { POSTGRES_DB: identity_db, POSTGRES_USER: identity, POSTGRES_PASSWORD: identity_pw }
+    ports: ["5441:5432"]
+    volumes: ["identity_data:/var/lib/postgresql/data"]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U identity"], interval: 5s, timeout: 5s, retries: 10 }
+  identity:
+    build: ./services/identity
+    environment:
+      SERVICE_NAME: identity
+      PORT: 3000
+      DB_HOST: identity-db
+      DB_PORT: 5432
+      DB_NAME: identity_db
+      DB_USER: identity
+      DB_PASSWORD: identity_pw
+      DB_DIALECT: postgres
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+    ports: ["3001:3000"]
+    depends_on:
+      identity-db: { condition: service_healthy }
+    restart: unless-stopped
+
+  # ---------------- academico ----------------
+  academico-db:
+    image: postgres:16-alpine
+    environment: { POSTGRES_DB: academico_db, POSTGRES_USER: academico, POSTGRES_PASSWORD: academico_pw }
+    ports: ["5442:5432"]
+    volumes: ["academico_data:/var/lib/postgresql/data"]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U academico"], interval: 5s, timeout: 5s, retries: 10 }
+  academico:
+    build: ./services/academico
+    environment:
+      SERVICE_NAME: academico
+      PORT: 3000
+      DB_HOST: academico-db
+      DB_PORT: 5432
+      DB_NAME: academico_db
+      DB_USER: academico
+      DB_PASSWORD: academico_pw
+      DB_DIALECT: postgres
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+    ports: ["3002:3000"]
+    depends_on:
+      academico-db: { condition: service_healthy }
+    restart: unless-stopped
+
+  # ---------------- espacios ----------------
+  espacios-db:
+    image: postgres:16-alpine
+    environment: { POSTGRES_DB: espacios_db, POSTGRES_USER: espacios, POSTGRES_PASSWORD: espacios_pw }
+    ports: ["5443:5432"]
+    volumes: ["espacios_data:/var/lib/postgresql/data"]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U espacios"], interval: 5s, timeout: 5s, retries: 10 }
+  espacios:
+    build: ./services/espacios
+    environment:
+      SERVICE_NAME: espacios
+      PORT: 3000
+      DB_HOST: espacios-db
+      DB_PORT: 5432
+      DB_NAME: espacios_db
+      DB_USER: espacios
+      DB_PASSWORD: espacios_pw
+      DB_DIALECT: postgres
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+    ports: ["3003:3000"]
+    depends_on:
+      espacios-db: { condition: service_healthy }
+    restart: unless-stopped
+
+  # ---------------- horarios ----------------
+  horarios-db:
+    image: postgres:16-alpine
+    environment: { POSTGRES_DB: horarios_db, POSTGRES_USER: horarios, POSTGRES_PASSWORD: horarios_pw }
+    ports: ["5444:5432"]
+    volumes: ["horarios_data:/var/lib/postgresql/data"]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U horarios"], interval: 5s, timeout: 5s, retries: 10 }
+  horarios:
+    build: ./services/horarios
+    environment:
+      SERVICE_NAME: horarios
+      PORT: 3000
+      DB_HOST: horarios-db
+      DB_PORT: 5432
+      DB_NAME: horarios_db
+      DB_USER: horarios
+      DB_PASSWORD: horarios_pw
+      DB_DIALECT: postgres
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+    ports: ["3004:3000"]
+    depends_on:
+      horarios-db: { condition: service_healthy }
+    restart: unless-stopped
+
+  # ---------------- reservas ----------------
+  reservas-db:
+    image: postgres:16-alpine
+    environment: { POSTGRES_DB: reservas_db, POSTGRES_USER: reservas, POSTGRES_PASSWORD: reservas_pw }
+    ports: ["5445:5432"]
+    volumes: ["reservas_data:/var/lib/postgresql/data"]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U reservas"], interval: 5s, timeout: 5s, retries: 10 }
+  reservas:
+    build: ./services/reservas
+    environment:
+      SERVICE_NAME: reservas
+      PORT: 3000
+      DB_HOST: reservas-db
+      DB_PORT: 5432
+      DB_NAME: reservas_db
+      DB_USER: reservas
+      DB_PASSWORD: reservas_pw
+      DB_DIALECT: postgres
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+      AMQP_URL: amqp://guest:guest@rabbitmq:5672
+    ports: ["3005:3000"]
+    depends_on:
+      reservas-db: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+    restart: unless-stopped
+
+  # ---------------- incidencias ----------------
+  incidencias-db:
+    image: postgres:16-alpine
+    environment: { POSTGRES_DB: incidencias_db, POSTGRES_USER: incidencias, POSTGRES_PASSWORD: incidencias_pw }
+    ports: ["5446:5432"]
+    volumes: ["incidencias_data:/var/lib/postgresql/data"]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U incidencias"], interval: 5s, timeout: 5s, retries: 10 }
+  incidencias:
+    build: ./services/incidencias
+    environment:
+      SERVICE_NAME: incidencias
+      PORT: 3000
+      DB_HOST: incidencias-db
+      DB_PORT: 5432
+      DB_NAME: incidencias_db
+      DB_USER: incidencias
+      DB_PASSWORD: incidencias_pw
+      DB_DIALECT: postgres
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+      AMQP_URL: amqp://guest:guest@rabbitmq:5672
+    ports: ["3006:3000"]
+    depends_on:
+      incidencias-db: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+    restart: unless-stopped
+
+  # ---------------- API Gateway ----------------
+  gateway:
+    build: ./gateway
+    environment:
+      PORT: 8080
+      IDENTITY_URL: http://identity:3000
+      ACADEMICO_URL: http://academico:3000
+      ESPACIOS_URL: http://espacios:3000
+      HORARIOS_URL: http://horarios:3000
+      RESERVAS_URL: http://reservas:3000
+      INCIDENCIAS_URL: http://incidencias:3000
+    ports: ["8080:8080"]
+    depends_on: [identity, academico, espacios, horarios, reservas, incidencias]
+    restart: unless-stopped
+
+volumes:
+  identity_data:
+  academico_data:
+  espacios_data:
+  horarios_data:
+  reservas_data:
+  incidencias_data:
