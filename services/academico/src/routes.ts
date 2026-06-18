@@ -17,6 +17,27 @@ export default function mountRoutes(app: Express): void {
     });
     res.json(carrera);
   });
+  // Semestres de una carrera (con sus asignaturas). Devuelve array crudo, como el monolito.
+  carreraR.get('/:id/semestre', async (req, res) => {
+    try {
+      const semestres = await Semestre.findAll({
+        where: { id_carrera: req.params.id } as any,
+        include: [{ model: Asignatura, as: 'asignaturas' }],
+        order: [['nivel', 'ASC']],
+      });
+      res.json(semestres);
+    } catch (e) {
+      res.status(500).json({ error: (e as Error).message });
+    }
+  });
+  carreraR.get('/:id', async (req, res) => {
+    const carrera = await Carrera.findByPk(req.params.id, { include: TipoCarrera });
+    if (!carrera) {
+      res.status(404).json({ msg: 'Carrera no encontrada' });
+      return;
+    }
+    res.json(carrera);
+  });
   app.use('/api/carrera', carreraR);
 
   // --- tipo de carrera (catálogo) ---
