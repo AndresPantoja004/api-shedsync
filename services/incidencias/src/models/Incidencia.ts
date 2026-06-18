@@ -4,7 +4,7 @@ import {
 } from 'sequelize';
 import { sequelize } from '../db';
 
-export class Incidencia extends Model
+export class Incidencia extends Model<
   InferAttributes<Incidencia>,
   InferCreationAttributes<Incidencia>
 > {
