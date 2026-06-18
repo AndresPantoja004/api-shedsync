@@ -12,4 +12,6 @@ export const config = {
     dialect: 'postgres' as const,
   },
   amqpUrl: process.env.AMQP_URL ?? null,
+  horariosUrl: process.env.HORARIOS_URL ?? 'http://localhost:3004',
+  reservasUrl: process.env.RESERVAS_URL ?? 'http://localhost:3005',
 };

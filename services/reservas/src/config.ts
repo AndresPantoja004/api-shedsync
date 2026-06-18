@@ -14,4 +14,5 @@ export const config = {
   amqpUrl: process.env.AMQP_URL ?? null,
   // Validación síncrona del espacio antes de reservar (en vez de un JOIN distribuido).
   espaciosUrl: process.env.ESPACIOS_URL ?? 'http://localhost:3003',
+  horariosUrl: process.env.HORARIOS_URL ?? 'http://localhost:3004',
 };

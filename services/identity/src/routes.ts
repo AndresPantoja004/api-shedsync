@@ -1,7 +1,7 @@
 import { Router, type Express } from 'express';
-import { Usuario } from './models';
 import { auth } from './middlewares/auth';
 import * as authCtrl from './controllers/auth.controller';
+import * as usuarioCtrl from './controllers/usuario.controller';
 import { seedAdmin } from './seed.service';
 
 export default function mountRoutes(app: Express): void {
@@ -21,9 +21,10 @@ export default function mountRoutes(app: Express): void {
 
   // --- /api/usuario ---
   const userR = Router();
-  userR.get('/', auth, async (_req, res) => {
-    const users = await Usuario.findAll({ attributes: ['id_usuario', 'email', 'phone', 'activo'] });
-    res.json({ service: 'identity', count: users.length, items: users });
-  });
+  // Usuario autenticado + datos académicos (composición HTTP a academico).
+  userR.get('/', auth, usuarioCtrl.getById);
+  // OJO: '/perfil' debe ir antes de cualquier '/:id'.
+  userR.put('/perfil', auth, usuarioCtrl.updatePerfil);
+  userR.post('/:id/asignar-rol', usuarioCtrl.asignarRol);
   app.use('/api/usuario', userR);
 }

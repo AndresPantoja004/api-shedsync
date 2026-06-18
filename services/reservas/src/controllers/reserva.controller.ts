@@ -16,6 +16,24 @@ async function espacioExiste(id_espacio: number): Promise<boolean> {
   }
 }
 
+// GET /api/reservas?fecha=&estado=  -> array crudo (lo consume espacios)
+export async function obtenerReservasPorFecha(req: Request, res: Response): Promise<void> {
+  try {
+    const fecha = req.query.fecha as string | undefined;
+    const estado = req.query.estado as string | undefined;
+    const reservas = await Reserva.findAll({
+      where: {
+        ...(fecha ? { fecha } : {}),
+        ...(estado ? { estado } : {}),
+      } as any,
+      order: [['hora_inicio', 'ASC']],
+    });
+    res.json(reservas);
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+}
+
 export async function crearReserva(req: Request, res: Response): Promise<void> {
   try {
     const { id_espacio, fecha, hora_inicio, hora_fin } = req.body ?? {};

@@ -29,6 +29,9 @@ TipoEstudiante.hasMany(EstudianteSemestre, { foreignKey: 'id_tipoestu' });
 EstudianteSemestre.belongsTo(Asignatura, { foreignKey: 'id_asignatura' });
 Asignatura.hasMany(EstudianteSemestre, { foreignKey: 'id_asignatura' });
 
+EstudianteSemestre.belongsTo(Semestre, { foreignKey: 'id_semestre' });
+Semestre.hasMany(EstudianteSemestre, { foreignKey: 'id_semestre' });
+
 Estudiante.belongsToMany(Semestre, { through: EstudianteSemestre, foreignKey: 'id_estudiante' });
 Semestre.belongsToMany(Estudiante, { through: EstudianteSemestre, foreignKey: 'id_semestre' });
 
