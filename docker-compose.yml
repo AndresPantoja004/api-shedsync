@@ -155,6 +155,7 @@ services:
       DB_DIALECT: postgres
       JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
       AMQP_URL: amqp://guest:guest@rabbitmq:5672
+      ESPACIOS_URL: http://espacios:3000
     ports: ["3006:3000"]
     depends_on:
       incidencias-db: { condition: service_healthy }

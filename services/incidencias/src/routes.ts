@@ -1,19 +1,19 @@
-const express = require('express');
-const { Incidencia } = require('./models');
-const { auth, onlyAdmin } = require('./middlewares/auth');
-const events = require('./events');
+import { Router, type Express } from 'express';
+import { auth, onlyAdmin } from './middlewares/auth';
+import * as ctrl from './controllers/incidencia.controller';
+import * as events from './events';
 
-events.connect();
+events.connect(); // intenta conectar a RabbitMQ (no bloquea si no está)
 
-module.exports = (app) => {
-  const r = express.Router();
-  // GET sin la columna imagen (base64 pesado)
-  r.get('/', auth, onlyAdmin, async (req, res) => {
-    const rows = await Incidencia.findAll({ attributes: { exclude: ['imagen'] }, order: [['fecha', 'DESC']] });
-    res.json({ service: 'incidencias', count: rows.length, items: rows });
-  });
-  // Primer candidato a migración real (fase 2): el id_usuario sale del JWT.
-  r.post('/', auth, (req, res) =>
-    res.status(501).json({ message: 'Pendiente fase 2: incidencia.create (id_usuario del JWT, id_espacio como ref lógica)' }));
+export default function mountRoutes(app: Express): void {
+  const r = Router();
+
+  // OJO con el orden: /count antes de /:id para que no lo capture el param.
+  r.post('/', auth, ctrl.create);
+  r.get('/count', ctrl.getCountByTipo);
+  r.get('/', auth, onlyAdmin, ctrl.getAll);
+  r.get('/:id', ctrl.getById);
+  r.patch('/:id/estado', auth, onlyAdmin, ctrl.updateEstado);
+
   app.use('/api/incidencia', r);
-};
+}

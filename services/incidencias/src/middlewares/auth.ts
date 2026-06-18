@@ -1,28 +1,32 @@
-const jwt = require('jsonwebtoken');
-const { jwtSecret } = require('../config');
+import type { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
+import { config } from '../config';
+import type { JwtUser } from '../types';
 
-// Verificación de JWT 100% local: NO se llama a identity en cada request.
-// Solo se valida la firma con el secreto compartido (mismo que emite identity).
-function auth(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  if (!authHeader) return res.status(401).json({ message: 'Token no proporcionado' });
-
-  const token = authHeader.split(' ')[1];
-  if (!token) return res.status(401).json({ message: 'Token inválido' });
-
+// Verificación de JWT 100% local (mismo secreto que firma identity).
+export function auth(req: Request, res: Response, next: NextFunction): void {
+  const header = req.headers['authorization'];
+  if (!header) {
+    res.status(401).json({ message: 'Token no proporcionado' });
+    return;
+  }
+  const token = header.split(' ')[1];
+  if (!token) {
+    res.status(401).json({ message: 'Token inválido' });
+    return;
+  }
   try {
-    req.user = jwt.verify(token, jwtSecret);
+    req.user = jwt.verify(token, config.jwtSecret) as JwtUser;
     next();
-  } catch (e) {
-    return res.status(401).json({ message: 'Token no válido o expirado' });
+  } catch {
+    res.status(401).json({ message: 'Token no válido o expirado' });
   }
 }
 
-function onlyAdmin(req, res, next) {
+export function onlyAdmin(req: Request, res: Response, next: NextFunction): void {
   if (req.user?.rol !== 3) {
-    return res.status(403).json({ message: 'Acceso solo para administradores' });
+    res.status(403).json({ message: 'Acceso solo para administradores' });
+    return;
   }
   next();
 }
-
-module.exports = { auth, onlyAdmin };
