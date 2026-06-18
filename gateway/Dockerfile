@@ -1,7 +1,8 @@
-FROM oven/bun:1
+FROM oven/bun:1-alpine
 WORKDIR /app
-COPY package*.json ./
-RUN bun install --omit=dev
+COPY package.json bun.lock* ./
+RUN bun install
+COPY tsconfig.json ./
 COPY src ./src
 EXPOSE 8080
-CMD ["bun", "src/index.js"]
+CMD ["bun", "run", "src/index.ts"]
