@@ -1,11 +1,11 @@
-const TipoCarrera = require('./TipoCarrera');
-const Carrera = require('./Carrera');
-const Semestre = require('./Semestre');
-const Asignatura = require('./Asignatura');
-const Profesor = require('./Profesor');
-const Estudiante = require('./Estudiante');
-const EstudianteSemestre = require('./EstudianteSemestre');
-const TipoEstudiante = require('./TipoEstudiante');
+import { TipoCarrera } from './TipoCarrera';
+import { Carrera } from './Carrera';
+import { Semestre } from './Semestre';
+import { Asignatura } from './Asignatura';
+import { Profesor } from './Profesor';
+import { Estudiante } from './Estudiante';
+import { EstudianteSemestre } from './EstudianteSemestre';
+import { TipoEstudiante } from './TipoEstudiante';
 
 // Todas estas relaciones son INTERNAS al contexto académico.
 Carrera.belongsTo(TipoCarrera, { foreignKey: 'id_tipo_carrera' });
@@ -32,7 +32,7 @@ Asignatura.hasMany(EstudianteSemestre, { foreignKey: 'id_asignatura' });
 Estudiante.belongsToMany(Semestre, { through: EstudianteSemestre, foreignKey: 'id_estudiante' });
 Semestre.belongsToMany(Estudiante, { through: EstudianteSemestre, foreignKey: 'id_semestre' });
 
-module.exports = {
+export {
   TipoCarrera, Carrera, Semestre, Asignatura,
   Profesor, Estudiante, EstudianteSemestre, TipoEstudiante,
 };

@@ -1,17 +1,28 @@
-const { sequelize, DataTypes } = require('../db');
+import {
+  DataTypes, Model,
+  type InferAttributes, type InferCreationAttributes,
+} from 'sequelize';
+import { sequelize } from '../db';
 
-const UsuarioRol = sequelize.define('UsuarioRol', {
-  id_usuario: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-  },
-  id_rol: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-  },
-}, {
-  tableName: 'usuario_rol',
-  timestamps: false,
-});
+export class UsuarioRol extends Model<InferAttributes<UsuarioRol>, InferCreationAttributes<UsuarioRol>> {
+  declare id_usuario: number;
+  declare id_rol: number;
+}
 
-module.exports = UsuarioRol;
+UsuarioRol.init(
+  {
+    id_usuario: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+    },
+    id_rol: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+    },
+  },
+  {
+    sequelize,
+    tableName: 'usuario_rol',
+    timestamps: false,
+  },
+);

@@ -1,17 +1,17 @@
-const express = require('express');
-const { Reserva } = require('./models');
-const events = require('./events');
+import { Router, type Express } from 'express';
+import { Reserva } from './models';
+import * as events from './events';
 
 events.connect(); // intenta conectar a RabbitMQ (no bloquea si no está)
 
-module.exports = (app) => {
-  const r = express.Router();
-  r.get('/', async (req, res) => {
+export default function mountRoutes(app: Express): void {
+  const r = Router();
+  r.get('/', async (_req, res) => {
     const rows = await Reserva.findAll({ order: [['fecha', 'DESC']] });
     res.json({ service: 'reservas', count: rows.length, items: rows });
   });
   // Stub que ilustra el flujo objetivo: validar espacio vía espacios + publicar evento.
-  r.post('/', (req, res) =>
+  r.post('/', (_req, res) =>
     res.status(501).json({
       message: 'Pendiente fase 3: crear reserva',
       flujo_objetivo: [
@@ -21,4 +21,4 @@ module.exports = (app) => {
       ],
     }));
   app.use('/api/reservas', r);
-};
+}

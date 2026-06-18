@@ -1,20 +1,24 @@
-const express = require('express');
-const { Espacio, Equipo } = require('./models');
+import { Router, type Express } from 'express';
+import type { WhereOptions } from 'sequelize';
+import { Espacio, Equipo } from './models';
 
-module.exports = (app) => {
-  const r = express.Router();
-  r.get('/', async (req, res) => {
+export default function mountRoutes(app: Express): void {
+  const r = Router();
+  r.get('/', async (_req, res) => {
     const rows = await Espacio.findAll();
     res.json({ service: 'espacios', count: rows.length, items: rows });
   });
   // Validación que consumirán reservas/incidencias en vez de un JOIN distribuido:
   r.get('/:id/exists', async (req, res) => {
     const e = await Espacio.findByPk(req.params.id);
-    res.json({ id_espacio: Number(req.params.id), exists: !!e, espacio: e || null });
+    res.json({ id_espacio: Number(req.params.id), exists: !!e, espacio: e ?? null });
   });
   r.get('/:id/equipos', async (req, res) => {
-    const rows = await Equipo.findAll({ where: { id_espacio: req.params.id } });
+    // id_espacio es la FK que inyecta la asociación, no está en InferAttributes<Equipo>
+    const rows = await Equipo.findAll({
+      where: { id_espacio: req.params.id } as WhereOptions<Equipo>,
+    });
     res.json({ count: rows.length, items: rows });
   });
   app.use('/api/espacio', r);
-};
+}

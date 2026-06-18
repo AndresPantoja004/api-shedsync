@@ -1,3 +1,3 @@
-const Reserva = require('./Reserva');
+import { Reserva } from './Reserva';
 // id_espacio es una referencia lógica al servicio espacios (no FK física).
-module.exports = { Reserva };
+export { Reserva };

@@ -1,10 +1,10 @@
-const amqp = require("amqplib");
-const config = require("./config");
+import amqp, { type Channel } from 'amqplib';
+import { config } from './config';
 
-const EXCHANGE = "schedsync.events";
-let channel = null;
+const EXCHANGE = 'schedsync.events';
+let channel: Channel | null = null;
 
-async function connect() {
+export async function connect(): Promise<Channel | null> {
   if (!config.amqpUrl) {
     console.log(`[${config.serviceName}] AMQP_URL no definido: eventos deshabilitados`);
     return null;
@@ -12,23 +12,23 @@ async function connect() {
   try {
     const conn = await amqp.connect(config.amqpUrl);
     channel = await conn.createChannel();
-    await channel.assertExchange(EXCHANGE, "topic", { durable: true });
+    await channel.assertExchange(EXCHANGE, 'topic', { durable: true });
     console.log(`[${config.serviceName}] conectado a RabbitMQ`);
   } catch (e) {
-    console.log(`[${config.serviceName}] RabbitMQ no disponible: ${e.message}`);
+    console.log(`[${config.serviceName}] RabbitMQ no disponible: ${(e as Error).message}`);
   }
   return channel;
 }
 
 // publish("reserva.creada", { id_reserva, id_espacio, ... })
-async function publish(routingKey, payload) {
+export async function publish(routingKey: string, payload: unknown): Promise<boolean> {
   if (!channel) return false;
   return channel.publish(
     EXCHANGE,
     routingKey,
     Buffer.from(JSON.stringify({ event: routingKey, data: payload, ts: Date.now() })),
-    { persistent: true }
+    { persistent: true },
   );
 }
 
-module.exports = { connect, publish, EXCHANGE };
+export { EXCHANGE };

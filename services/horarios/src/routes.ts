@@ -1,13 +1,13 @@
-const express = require('express');
-const { Horario } = require('./models');
+import { Router, type Express } from 'express';
+import { Horario } from './models';
 
-module.exports = (app) => {
-  const r = express.Router();
-  r.get('/', async (req, res) => {
+export default function mountRoutes(app: Express): void {
+  const r = Router();
+  r.get('/', async (_req, res) => {
     const rows = await Horario.findAll();
     res.json({ service: 'horarios', count: rows.length, items: rows });
   });
-  r.post('/import', (req, res) =>
+  r.post('/import', (_req, res) =>
     res.status(501).json({ message: 'Pendiente fase 3: parser XLSX -> referencias por id_asignatura/id_espacio' }));
   app.use('/api/horario', r);
-};
+}

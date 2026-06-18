@@ -1,16 +1,24 @@
-const { sequelize, DataTypes } = require('../db');
+import {
+  DataTypes, Model,
+  type InferAttributes, type InferCreationAttributes, type CreationOptional,
+} from 'sequelize';
+import { sequelize } from '../db';
 
-const Asignatura = sequelize.define('Asignatura', {
-  id_asignatura: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
+export class Asignatura extends Model<InferAttributes<Asignatura>, InferCreationAttributes<Asignatura>> {
+  declare id_asignatura: CreationOptional<number>;
+  declare nombre: string;
+  declare nrc: string;
+}
+
+Asignatura.init(
+  {
+    id_asignatura: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    nombre: DataTypes.STRING,
+    nrc: DataTypes.STRING,
   },
-  nombre: DataTypes.STRING,
-  nrc: DataTypes.STRING,
-}, {
-  tableName: 'asignatura',
-  timestamps: false,
-});
-
-module.exports = Asignatura;
+  { sequelize, tableName: 'asignatura', timestamps: false },
+);

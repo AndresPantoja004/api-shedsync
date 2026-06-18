@@ -1,12 +1,12 @@
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
-const config = require('./config');
+import express, { type Express } from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import { config } from './config';
 
 // Construye la app Express base. El gateway centraliza CORS/rate-limit,
 // pero cada servicio se mantiene autónomo y arrancable por sí solo.
-function buildApp(mountRoutes) {
+export function buildApp(mountRoutes?: (app: Express) => void): Express {
   const app = express();
   app.use(helmet());
   app.use(cors());
@@ -14,16 +14,14 @@ function buildApp(mountRoutes) {
   app.use(express.urlencoded({ limit: '50mb', extended: true }));
   app.use(morgan('dev'));
 
-  app.get('/health', (req, res) =>
-    res.json({ service: config.serviceName, status: 'ok', uptime: process.uptime() })
+  app.get('/health', (_req, res) =>
+    res.json({ service: config.serviceName, status: 'ok', uptime: process.uptime() }),
   );
 
   if (mountRoutes) mountRoutes(app);
 
   app.use((req, res) =>
-    res.status(404).json({ error: 'Not found', service: config.serviceName, path: req.path })
+    res.status(404).json({ error: 'Not found', service: config.serviceName, path: req.path }),
   );
   return app;
 }
-
-module.exports = buildApp;
