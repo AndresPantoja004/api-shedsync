@@ -12,4 +12,9 @@ export const config = {
     dialect: 'postgres' as const,
   },
   amqpUrl: process.env.AMQP_URL ?? null,
+  // identity COMPONE los datos académicos del login llamando a academico.
+  academicoUrl: process.env.ACADEMICO_URL ?? 'http://localhost:3002',
+  // Credenciales del admin inicial (seed). Reemplaza a seed_adminUser.js.
+  adminEmail: process.env.ADMIN_EMAIL ?? 'admin@sched.sync',
+  adminPass: process.env.ADMIN_PASS ?? 'admin123',
 };

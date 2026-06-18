@@ -12,4 +12,6 @@ export const config = {
     dialect: 'postgres' as const,
   },
   amqpUrl: process.env.AMQP_URL ?? null,
+  // Validación síncrona del espacio antes de reservar (en vez de un JOIN distribuido).
+  espaciosUrl: process.env.ESPACIOS_URL ?? 'http://localhost:3003',
 };

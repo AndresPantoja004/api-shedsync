@@ -75,7 +75,10 @@ export default function mountRoutes(app: Express): void {
   });
   // Endpoint pensado para que el gateway/identity COMPONGA el login:
   estR.get('/by-usuario/:id_usuario', async (req, res) => {
-    const est = await Estudiante.findOne({ where: { id_usuario: req.params.id_usuario } });
+    const est = await Estudiante.findOne({
+      where: { id_usuario: req.params.id_usuario },
+      include: [{ model: Carrera, attributes: ['nombre'] }],
+    });
     if (!est) {
       res.status(404).json({ message: 'Sin estudiante para ese usuario' });
       return;
