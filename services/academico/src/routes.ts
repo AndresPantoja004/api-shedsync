@@ -169,6 +169,7 @@ export default function mountRoutes(app: Express): void {
         id_asignatura: a.id_asignatura,
         id_tipoestu,
       }));
+      console.log(data)
       await EstudianteSemestre.bulkCreate(data as any);
       res.status(201).json({ msg: 'Asignaturas asignadas correctamente' });
     } catch (e) {

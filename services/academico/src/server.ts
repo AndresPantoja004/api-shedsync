@@ -3,6 +3,7 @@ import { config } from './config';
 import { sequelize } from './db';
 import './models'; // registra modelos + asociaciones internas del servicio
 import mountRoutes from './routes';
+import { seedCatalogos } from './seed.service';
 
 async function connectWithRetry(retries = 12, delayMs = 3000): Promise<void> {
   for (let i = 1; i <= retries; i++) {
@@ -20,6 +21,7 @@ async function connectWithRetry(retries = 12, delayMs = 3000): Promise<void> {
 try {
   await connectWithRetry();
   await sequelize.sync(); // scaffold: crea las tablas propias del servicio
+  await seedCatalogos();  // siembra catálogos fijos (tipo_estudiante) requeridos por FKs
   const app = buildApp(mountRoutes);
   app.listen(config.port, () => console.log(`[${config.serviceName}] escuchando en :${config.port}`));
 } catch (e) {

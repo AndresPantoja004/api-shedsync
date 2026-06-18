@@ -32,8 +32,10 @@ Asignatura.hasMany(EstudianteSemestre, { foreignKey: 'id_asignatura' });
 EstudianteSemestre.belongsTo(Semestre, { foreignKey: 'id_semestre' });
 Semestre.hasMany(EstudianteSemestre, { foreignKey: 'id_semestre' });
 
-Estudiante.belongsToMany(Semestre, { through: EstudianteSemestre, foreignKey: 'id_estudiante' });
-Semestre.belongsToMany(Estudiante, { through: EstudianteSemestre, foreignKey: 'id_semestre' });
+// unique:false -> evita el índice único (id_estudiante,id_semestre) que por defecto
+// crea belongsToMany; un estudiante cursa VARIAS asignaturas en el mismo semestre.
+Estudiante.belongsToMany(Semestre, { through: { model: EstudianteSemestre, unique: false }, foreignKey: 'id_estudiante' });
+Semestre.belongsToMany(Estudiante, { through: { model: EstudianteSemestre, unique: false }, foreignKey: 'id_semestre' });
 
 export {
   TipoCarrera, Carrera, Semestre, Asignatura,

@@ -1,10 +1,11 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
-const rateLimit = require('express-rate-limit');
-const { createProxyMiddleware } = require('http-proxy-middleware');
+import 'dotenv/config';
+import express, { type Request, type Response } from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import rateLimit from 'express-rate-limit';
+import { createProxyMiddleware } from 'http-proxy-middleware';
+import type { ServerResponse } from 'http';
 
 const PORT = Number(process.env.PORT) || 8080;
 
@@ -37,14 +38,14 @@ app.use(morgan('dev'));
 app.use(rateLimit({ windowMs: 60 * 1000, max: 120 })); // rate limiting centralizado
 
 // Health agregado: estado del gateway + de cada servicio.
-app.get('/health', async (req, res) => {
+app.get('/health', async (_req: Request, res: Response) => {
   const checks = await Promise.all(
     Object.entries(targets).map(async ([name, url]) => {
       try {
         const r = await fetch(`${url}/health`, { signal: AbortSignal.timeout(2000) });
-        return [name, r.ok ? 'ok' : 'down'];
+        return [name, r.ok ? 'ok' : 'down'] as const;
       } catch {
-        return [name, 'down'];
+        return [name, 'down'] as const;
       }
     })
   );
@@ -55,19 +56,21 @@ app.get('/health', async (req, res) => {
 for (const { prefixes, target, name } of routeMap) {
   app.use(
     createProxyMiddleware({
-      pathFilter: (path) => prefixes.some((p) => path === p || path.startsWith(p + '/')),
+      pathFilter: (path: string) => prefixes.some((p) => path === p || path.startsWith(p + '/')),
       target,
       changeOrigin: true,
       on: {
-        error: (err, req, res) => {
-          res.writeHead(502, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'Servicio no disponible', servicio: name, target }));
+        error: (_err: Error, _req: unknown, res: unknown) => {
+          const out = res as ServerResponse;
+          out.writeHead(502, { 'Content-Type': 'application/json' });
+          out.end(JSON.stringify({ error: 'Servicio no disponible', servicio: name, target }));
         },
       },
     })
   );
 }
 
-app.use((req, res) => res.status(404).json({ error: 'Ruta no enrutada por el gateway', path: req.path }));
+app.use((req: Request, res: Response) =>
+  res.status(404).json({ error: 'Ruta no enrutada por el gateway', path: req.path }));
 
 app.listen(PORT, () => console.log(`[gateway] escuchando en :${PORT}`));
