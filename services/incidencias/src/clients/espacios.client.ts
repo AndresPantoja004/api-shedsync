@@ -25,9 +25,8 @@ export async function getEspacio(id: number): Promise<EspacioDTO | null> {
   return data?.espacio ?? null;
 }
 
-// GET /api/espacio -> { items: Espacio[] }  ->  Map<id_espacio, EspacioDTO>
+// GET /api/espacio -> Espacio[] (array directo)  ->  Map<id_espacio, EspacioDTO>
 export async function getEspaciosMap(): Promise<Map<number, EspacioDTO>> {
-  const data = await getJson<{ items: EspacioDTO[] }>(`${BASE}/api/espacio`);
-  const items = data?.items ?? [];
-  return new Map(items.map((e) => [e.id_espacio, e]));
+  const items = await getJson<EspacioDTO[]>(`${BASE}/api/espacio`);
+  return new Map((items ?? []).map((e) => [e.id_espacio, e]));
 }

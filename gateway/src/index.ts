@@ -23,9 +23,10 @@ const targets = {
 const routeMap = [
   { prefixes: ['/api/auth', '/api/usuario'], target: targets.identity, name: 'identity' },
   { prefixes: ['/api/carrera', '/api/estudiante'], target: targets.academico, name: 'academico' },
+  // reservas captura /api/espacio/reservar* ANTES que espacios:
+  { prefixes: ['/api/espacio/reservar', '/api/reservas'], target: targets.reservas, name: 'reservas' },
   { prefixes: ['/api/espacio'], target: targets.espacios, name: 'espacios' },
   { prefixes: ['/api/horario'], target: targets.horarios, name: 'horarios' },
-  { prefixes: ['/api/reservas'], target: targets.reservas, name: 'reservas' },
   { prefixes: ['/api/incidencia'], target: targets.incidencias, name: 'incidencias' },
 ];
 

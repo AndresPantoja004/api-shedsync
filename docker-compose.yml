@@ -80,6 +80,8 @@ services:
       DB_PASSWORD: espacios_pw
       DB_DIALECT: postgres
       JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+      HORARIOS_URL: http://horarios:3000
+      RESERVAS_URL: http://reservas:3000
     ports: ["3003:3000"]
     depends_on:
       espacios-db: { condition: service_healthy }
@@ -129,6 +131,8 @@ services:
       DB_DIALECT: postgres
       JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
       AMQP_URL: amqp://guest:guest@rabbitmq:5672
+      ESPACIOS_URL: http://espacios:3000
+      HORARIOS_URL: http://horarios:3000
     ports: ["3005:3000"]
     depends_on:
       reservas-db: { condition: service_healthy }
