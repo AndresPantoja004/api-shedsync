@@ -32,6 +32,7 @@ services:
       DB_PASSWORD: identity_pw
       DB_DIALECT: postgres
       JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+      ACADEMICO_URL: http://academico:3000
     ports: ["3001:3000"]
     depends_on:
       identity-db: { condition: service_healthy }
@@ -106,6 +107,8 @@ services:
       DB_PASSWORD: horarios_pw
       DB_DIALECT: postgres
       JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+      ACADEMICO_URL: http://academico:3000
+      ESPACIOS_URL: http://espacios:3000
     ports: ["3004:3000"]
     depends_on:
       horarios-db: { condition: service_healthy }

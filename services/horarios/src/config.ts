@@ -12,4 +12,7 @@ export const config = {
     dialect: 'postgres' as const,
   },
   amqpUrl: process.env.AMQP_URL ?? null,
+  // Destinos para orquestar el import del XLSX (resolución por nombre en Docker).
+  academicoUrl: process.env.ACADEMICO_URL ?? 'http://localhost:3002',
+  espaciosUrl: process.env.ESPACIOS_URL ?? 'http://localhost:3003',
 };

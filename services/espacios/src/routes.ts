@@ -8,6 +8,15 @@ export default function mountRoutes(app: Express): void {
     const rows = await Espacio.findAll();
     res.json({ service: 'espacios', count: rows.length, items: rows });
   });
+  // findOrCreate idempotente (lo consume horarios al importar el XLSX).
+  r.post('/', async (req, res) => {
+    const { nombre, tipo, capacidad } = req.body ?? {};
+    const [espacio] = await Espacio.findOrCreate({
+      where: { nombre },
+      defaults: { nombre, tipo, capacidad },
+    });
+    res.json(espacio);
+  });
   // Validación que consumirán reservas/incidencias en vez de un JOIN distribuido:
   r.get('/:id/exists', async (req, res) => {
     const e = await Espacio.findByPk(req.params.id);
