@@ -28,7 +28,7 @@ ShedSync es una API de gestión de horarios desarrollada para la aplicación mó
 
 - Node.js (versión 14 o superior)
 - PostgreSQL (versión 10 o superior)
-- npm o yarn
+- bun o yarn
 
 ## Instalacion
 
@@ -42,7 +42,7 @@ cd api-shedsync
 2. Instalar dependencias:
 
 ```bash
-npm install
+bun install
 ```
 
 3. Configurar variables de entorno:
@@ -65,13 +65,13 @@ DB_USE=postgres
 5. Crear las tablas de la base de datos:
 
 ```bash
-npm run create-tables
+bun run create-tables
 ```
 
 6. (Opcional) Poblar la base de datos con datos iniciales:
 
 ```bash
-npm run insert-data
+bun run insert-data
 ```
 
 ## Configuracion
@@ -268,11 +268,11 @@ Flujo de autenticacion:
 ## Scripts Disponibles
 
 ```bash
-npm start              # Inicia el servidor en modo produccion
-npm run dev            # Inicia el servidor en modo desarrollo con nodemon
-npm run create-tables  # Crea las tablas de la base de datos
-npm run insert-data    # Inserta datos iniciales desde archivos XLSX
-npm test               # Ejecuta los tests (no configurado aun)
+bun start              # Inicia el servidor en modo produccion
+bun run dev            # Inicia el servidor en modo desarrollo con nodemon
+bun run create-tables  # Crea las tablas de la base de datos
+bun run insert-data    # Inserta datos iniciales desde archivos XLSX
+bun test               # Ejecuta los tests (no configurado aun)
 ```
 
 ## Documentacion API
@@ -303,7 +303,7 @@ Esta documentacion se genera automaticamente desde el archivo [swagger.json](swa
 Para ejecutar en modo desarrollo con reinicio automatico:
 
 ```bash
-npm run dev
+bun run dev
 ```
 
 El servidor se iniciara en `http://localhost:3000`
